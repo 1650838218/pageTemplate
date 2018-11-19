@@ -1113,7 +1113,15 @@ nav li {
 		width: 210px
 	}
 
-	nav.main-menu i.nav-icon {
+	nav.main-menu .nav-icon,
+	i.fa.fa-home.nav_icon,
+	i.fa.fa-address-card-o.nav_icon,
+	i.fa.fa-medkit.nav_icon,
+	i.fa.fa-file-text-o.nav_icon,
+	i.fa.fa-bar-chart.nav_icon,
+	i.fa.fa-map-marker,
+	i.fa.fa-exclamation-triangle,
+	i.fa.fa-list-ul {
 		position: relative;
 		display: table-cell;
 		width: 60px;
@@ -1244,7 +1252,15 @@ nav li {
 		max-height: 1000px
 	}
 
-	nav.main-menu i.nav-icon {
+	nav.main-menu .nav-icon,
+	i.fa.fa-home.nav_icon,
+	i.fa.fa-cogs,
+	i.fa.fa-check-square-o.nav_icon,
+	i.fa.fa-file-text-o.nav_icon,
+	i.fa.fa-bar-chart.nav_icon,
+	i.fa.fa-map-marker,
+	i.fa.fa-exclamation-triangle,
+	i.fa.fa-list-ul {
 		position: relative;
 		display: table-cell;
 		width: 60px;
