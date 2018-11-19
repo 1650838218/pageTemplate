@@ -1051,7 +1051,7 @@ nav li {
 	nav.main-menu li {
 		position: relative;
 		display: block;
-		width: 250px
+		width: 200px
 	}
 
 	nav.main-menu li>a {
@@ -1070,7 +1070,7 @@ nav li {
 		display: inline-block;
 		background: #00bcd4;
 		top: 0;
-		right: -210px;
+		right: -160px;
 		width: 0;
 		overflow: hidden;
 		-webkit-transition: width 0s .05s linear;
@@ -1081,11 +1081,11 @@ nav li {
 		display: table;
 		border-collapse: collapse;
 		border-spacing: 0;
-		width: 210px
+		width: 160px
 	}
 
 	nav.main-menu li li>a {
-		width: 210px;
+		width: 160px;
 		color: #FFFFFF;
 		padding: .7em 0;
 	}
@@ -1110,10 +1110,10 @@ nav li {
 
 	.no-touch nav.main-menu li:hover ul,
 	nav.main-menu li.active ul {
-		width: 210px
+		width: 160px
 	}
 
-	nav.main-menu .nav-icon,
+	nav.main-menu .nav-icon/* ,
 	i.fa.fa-home.nav_icon,
 	i.fa.fa-address-card-o.nav_icon,
 	i.fa.fa-medkit.nav_icon,
@@ -1121,7 +1121,7 @@ nav li {
 	i.fa.fa-bar-chart.nav_icon,
 	i.fa.fa-map-marker,
 	i.fa.fa-exclamation-triangle,
-	i.fa.fa-list-ul {
+	i.fa.fa-list-ul */ {
 		position: relative;
 		display: table-cell;
 		width: 60px;
@@ -1140,12 +1140,16 @@ nav li {
 		left: -1px;
 		display: table-cell;
 		vertical-align: middle;
-		width: 190px;
+		width: 140px;
 		visibility: hidden;
 		padding: .7em 0;
 	}
+    
+    nav.main-menu .nav-text.icon-right {
+    	width: 120px !important;
+    }
 
-	nav.main-menu .icon-angle-right,
+	nav.main-menu .icon-i-arrow-right,
 	.icon-angle-down {
 		display: table-cell;
 		width: 20px;
@@ -1155,7 +1159,7 @@ nav li {
 
 	.no-touch nav.main-menu:hover,
 	nav.main-menu.expanded {
-		width: 250px;
+		width: 200px;
 		overflow: visible
 	}
 
@@ -1252,7 +1256,7 @@ nav li {
 		max-height: 1000px
 	}
 
-	nav.main-menu .nav-icon,
+	nav.main-menu .nav-icon/* ,
 	i.fa.fa-home.nav_icon,
 	i.fa.fa-cogs,
 	i.fa.fa-check-square-o.nav_icon,
@@ -1260,7 +1264,7 @@ nav li {
 	i.fa.fa-bar-chart.nav_icon,
 	i.fa.fa-map-marker,
 	i.fa.fa-exclamation-triangle,
-	i.fa.fa-list-ul {
+	i.fa.fa-list-ul */ {
 		position: relative;
 		display: table-cell;
 		width: 60px;
@@ -1281,7 +1285,7 @@ nav li {
 		vertical-align: middle
 	}
 
-	nav.main-menu .icon-angle-right {
+	nav.main-menu .icon-i-arrow-right {
 		display: table-cell;
 		width: 20px;
 		vertical-align: middle;
@@ -1612,7 +1616,7 @@ nav.user-menu .panel .list-group-item .time-ago {
 	}
 	*/
 .main-grid {
-	padding: 3em;
+	padding: 1em;
 }
 
 .dashboard-page .title-bar {
@@ -6398,7 +6402,7 @@ div#vmap {
 }
 
 @media(max-width:479px) {
-	i.icon-angle-right {
+	i.icon-i-arrow-right {
 		display: none !important;
 	}
 
