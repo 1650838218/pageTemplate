@@ -1,73 +1,88 @@
-[
+var menuData = [
     {
 		"name": "主页",
 		"icon": "icon iconfont icon-zhuye1",
+		"url": "javascript:void(0);",
 		"children": []
 	},
 	{
 		"name": "病历管理",
 		"icon": "icon iconfont icon-37menzhenbingli",
+		"url": "javascript:void(0);",
 		"children": []
 	},
 	{
 		"name": "药房管理",
 		"icon": "icon iconfont icon-yaofangguanli1",
-		"children": [
-            {
-                "name": "进货商名片"
-            }, 
-            {
-                "name": "进货单"
-            },
-             {
-             	"name": "库存"
-             }, 
-             {
-             	"name": "统计"
-             }
-        ]
+		"url": "javascript:void(0);",
+		"children": [{
+				"name": "进货商名片",
+				"url": "javascript:void(0);"
+			},
+			{
+				"name": "进货单",
+				"url": "javascript:void(0);"
+			},
+			{
+				"name": "库存",
+				"url": "javascript:void(0);"
+			},
+			{
+				"name": "统计",
+				"url": "javascript:void(0);"
+			}
+		]
 	},
 	{
 		"name": "知识库",
 		"icon": "icon iconfont icon-zhishiku2",
-		"children": [
-            {
-                "name": "药材"
-            }, 
-            {
-                "name": "处方"
-            },
-             {
-             	"name": "穴位"
-             }, 
-             {
-             	"name": "电子书"
-             }
-        ]
+        "url": "javascript:void(0);",
+		"children": [{
+				"name": "药材",
+                "url": "javascript:void(0);"
+			},
+			{
+				"name": "处方",
+                "url": "javascript:void(0);"
+			},
+			{
+				"name": "穴位",
+                "url": "javascript:void(0);"
+			},
+			{
+				"name": "电子书",
+                "url": "javascript:void(0);"
+			}
+		]
 	},
 	{
 		"name": "会员管理",
 		"icon": "icon iconfont icon-huiyuan",
+        "url": "javascript:void(0);",
 		"children": []
 	},
 	{
 		"name": "账簿",
 		"icon": "icon iconfont icon-wenjian-zhangbu",
+        "url": "javascript:void(0);",
 		"children": []
 	},
 	{
 		"name": "系统设置",
 		"icon": "icon iconfont icon-xitongshezhi",
-		"children": [
-            {
-                "name": "修改登录口令"
-            }, 
-            {
-                "name": "菜单管理"
-            },
-             {
-             	"name": "数据字典"
-             }
-        ]
+        "url": "javascript:void(0);",
+		"children": [{
+				"name": "修改登录口令",
+                "url": "javascript:void(0);"
+			},
+			{
+				"name": "菜单管理",
+                "url": "javascript:void(0);"
+			},
+			{
+				"name": "数据字典",
+                "url": "javascript:void(0);"
+			}
+		]
 	}
 ]
