@@ -1,0 +1,73 @@
+[
+    {
+		"name": "主页",
+		"icon": "icon iconfont icon-zhuye1",
+		"children": []
+	},
+	{
+		"name": "病历管理",
+		"icon": "icon iconfont icon-37menzhenbingli",
+		"children": []
+	},
+	{
+		"name": "药房管理",
+		"icon": "icon iconfont icon-yaofangguanli1",
+		"children": [
+            {
+                "name": "进货商名片"
+            }, 
+            {
+                "name": "进货单"
+            },
+             {
+             	"name": "库存"
+             }, 
+             {
+             	"name": "统计"
+             }
+        ]
+	},
+	{
+		"name": "知识库",
+		"icon": "icon iconfont icon-zhishiku2",
+		"children": [
+            {
+                "name": "药材"
+            }, 
+            {
+                "name": "处方"
+            },
+             {
+             	"name": "穴位"
+             }, 
+             {
+             	"name": "电子书"
+             }
+        ]
+	},
+	{
+		"name": "会员管理",
+		"icon": "icon iconfont icon-huiyuan",
+		"children": []
+	},
+	{
+		"name": "账簿",
+		"icon": "icon iconfont icon-wenjian-zhangbu",
+		"children": []
+	},
+	{
+		"name": "系统设置",
+		"icon": "icon iconfont icon-xitongshezhi",
+		"children": [
+            {
+                "name": "修改登录口令"
+            }, 
+            {
+                "name": "菜单管理"
+            },
+             {
+             	"name": "数据字典"
+             }
+        ]
+	}
+]
