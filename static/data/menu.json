@@ -1,4 +1,4 @@
-var menuData = [
+[
     {
 		"name": "主页",
 		"icon": "icon iconfont icon-zhuye1",
@@ -81,7 +81,7 @@ var menuData = [
 			},
 			{
 				"name": "数据字典",
-                "url": "javascript:void(0);"
+                "url": "system/dictionary/dictionary.html"
 			}
 		]
 	}
