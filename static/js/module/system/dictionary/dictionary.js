@@ -7,11 +7,20 @@ $(function () {
     $('#dictionaryModal').on('hidden.bs.modal', function (e) {
         $("#dictionaryModal input").val('');
     });
-    // 模态框 保存 按钮点击事件
-    $('#saveBtn').on('click', function () {
-        // flag = true/false
-        var flag = $(formName).data(“bootstrapValidator”).isValid();
-    });
+    // 模态框 保存 按钮绑定点击事件
+    $('#saveBtn').on('click', saveBtnClick);
+
+    /**
+     * 模态框 保存 按钮点击事件
+     */
+    function saveBtnClick() {
+        $('#dictionaryModal').data('bootstrapValidator').validate();// 触发校验
+        var flag = $('#dictionaryModal').data('bootstrapValidator').isValid();// 获取校验结果
+        if (flag) {
+            saveDictionary($('#dictionaryModal form').serialize());
+        }
+    }
+
     // 表单验证
     $('#dictionaryModal form').bootstrapValidator({
         message: 'This value is not valid',
@@ -87,6 +96,9 @@ $(function () {
             $.each(zNodes,function (i,node) {
                 if (node.pId != null) {
                     node.showName = node.name + "【" + node.code + "】";
+                    if (node.type == 0) {
+                        node.isParent = true;
+                    }
                 } else {
                     node.showName = node.name;
                     node.isParent = true;
@@ -97,10 +109,6 @@ $(function () {
             // 搜索框内容改变监听事件
             fuzzySearch('dictionaryTree', '#searchInput', null, true); //初始化模糊搜索方法
             dictionaryTree.selectNode(dictionaryTree.getNodes()[0])
-            $('.blank-text-div').hide();// 隐藏提示信息
-        } else {
-            // 没有数据时显示提示信息
-            $('.blank-text-div').show();
         }
     }
 
@@ -139,6 +147,7 @@ $(function () {
         if (treeNode) {
             var parentNode = treeNode.getParentNode();
             $("#dictionaryModal input[name='pId']").val(parentNode.pId);// 设置pId
+            $("#dictionaryModal input[name='type']").val(treeNode.level);// 设置节点类型
         }
         $('#dictionaryModal').modal();
     }
@@ -158,86 +167,29 @@ $(function () {
     }
 
     /**
-     * 弹出编辑框
-     */
-    function showEditWindow(option, callback) {
-        // 将编辑面板移动到index.html的layerPanel中，不做这一步，遮罩会有问题
-        $("#layerPanel").append($("#layerContent div"));
-        var localOption = {
-            skin: 'layer-myskin',
-            title: '基本信息',
-            btn: [BTN.save],
-            content: $("#layerPanel"),
-            end: function () {
-                // 重置所有输入项
-                $("#layerPanel").find("input").each(function (index, element) {
-                    $(element).val('');
-                });
-                // 将弹出框源码放到原位置
-                $("#layerContent").append($("#layerPanel div"));
-            },
-            yes: function (index, layero) {
-                // 获取表单的数据，并保存
-                var data = {};
-                $("#layerPanel").find("input").each(function (index, element) {
-                    data[$(element).attr('name')] = $(element).val();
-                });
-                if (callback.validate(data)) {
-                    layer.close(index); //如果设定了yes回调，需进行手工关闭
-                    callback.save(data);// 回调方法，保存
-                }
-            }
-        };
-        layer.prompt($.extend(localOption, option));
-    }
-
-    /**
-     * 数据校验
-     * @param data
-     */
-    function validate(data) {
-        if (!data || !data.name) {
-            layer.msg('请填写疾病名称！', {icon: 2, time: 1000});
-            $("#layerPanel").find("input[name='name']").focus();
-            return false;
-        } else if (data.name.length > 10) {
-            layer.msg('疾病名称不能超过10个汉字！', {icon: 2, time: 2000});
-            $("#layerPanel").find("input[name='name']").focus();
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 疾病保存
+     * 数据字典保存
      * @param data
      */
     function saveDictionary(data) {
-        $.post('/prescription/Dictionary/save', data, function (data, textStatus, jqXHR) {
-            if (data) {
+        $.post('', data, function (resultData, textStatus, jqXHR) {
+            if (resultData) {
                 layer.msg(MSG.save_success, {offset: 'rb', time: 2000});
-                // 增加节点并选中
-                var treeobj = $.fn.zTree.getZTreeObj('dictionaryTree');
-                if (treeobj != null) {
-                    data.isDictionary = true;
-                    var oldNode = treeobj.getNodeByParam('id',data.id,null);
-                    if (oldNode == null) {// 新增
-                        var newNodes = [];
-                        if (data.pId == -1) {
-                            newNodes = treeobj.addNodes(null, data);
-                        } else {
-                            var parentNode = treeobj.getNodeByParam('id', data.pId, null);
-                            newNodes = treeobj.addNodes(parentNode, data);
-                        }
-                        treeobj.selectNode(newNodes[0]);
-                        treeobj.setting.callback.onClick(null, treeobj.setting.treeId, newNodes[0]);
-                    } else {// 修改
-                        oldNode.name = data.name;
-                        treeobj.updateNode(oldNode);
-                        // treeobj.setting.callback.onClick(null, treeobj.setting.treeId, oldNode);
-                    }
-                } else {
-                    $.getJSON('/prescription/Dictionary/loadTree', loadTree);
+                // 数据设置
+                resultData.showName = resultData.name + "【" + resultData.code + "】";
+                if (resultData.type == 0) {
+                    resultData.isParent = true;
+                }
+                var treeobj = $.fn.zTree.getZTreeObj('dictionaryTree');// 获取ztree
+                var oldNode = treeobj.getNodeByParam('id',resultData.id,null);// 根据id查询是否存在该节点
+                if (oldNode == null) {// 新增 不存在
+                    var parentNode = treeobj.getNodeByParam('id', resultData.pId, null);
+                    var newNodes = treeobj.addNodes(parentNode, resultData);
+                    treeobj.selectNode(newNodes[0]);
+                } else {// 修改 存在
+                    oldNode.name = resultData.name;
+                    oldNode.code = resultData.code;
+                    oldNode.showName = resultData.showName;
+                    treeobj.updateNode(oldNode);
                 }
             } else {
                 layer.msg(MSG.save_fail, {offset: 'rb', time: 2000});
@@ -253,14 +205,8 @@ $(function () {
             if (treeNode.children) {// 有子节点
                 layer.msg('请先删除子节点！',{time:2000});
             } else {
-                var msg = '',url = '';
-                if (treeNode.isDictionary) {
-                    msg = MSG.delete_confirm + '名为' + treeNode.name + '的疾病类型及其处方吗?';
-                    url = '/prescription/Dictionary/delete/';
-                } else {
-                    msg = MSG.delete_confirm + '名为' + treeNode.name + '的处方吗?';
-                    url = '/prescription/prescribe/delete/';
-                }
+                var msg = MSG.delete_confirm + ' ' + treeNode.name + ' 吗?';
+                var url = '';
                 layer.confirm(msg, {icon: 3, title: BTN.delete }, function (index) {
                     // 后台删除
                     $.ajax({
@@ -286,6 +232,5 @@ $(function () {
         }
         return false;
     }
-
 });
 
