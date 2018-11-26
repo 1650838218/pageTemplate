@@ -14,8 +14,8 @@ $(function () {
      * 模态框 保存 按钮点击事件
      */
     function saveBtnClick() {
-        $('#dictionaryModal').data('bootstrapValidator').validate();// 触发校验
-        var flag = $('#dictionaryModal').data('bootstrapValidator').isValid();// 获取校验结果
+        $('#dictionaryModal form').bootstrapValidator('validate');// 触发校验
+        var flag = $('#dictionaryModal form').data('bootstrapValidator').isValid();// 获取校验结果
         if (flag) {
             saveDictionary($('#dictionaryModal form').serialize());
         }
@@ -146,7 +146,11 @@ $(function () {
         var treeNode = event.data;
         if (treeNode) {
             var parentNode = treeNode.getParentNode();
-            $("#dictionaryModal input[name='pId']").val(parentNode.pId);// 设置pId
+            if (parentNode) {
+                $("#dictionaryModal input[name='pId']").val(parentNode.pId);// 设置pId
+            } else {
+                $("#dictionaryModal input[name='pId']").val(0);// 设置pId
+            }
             $("#dictionaryModal input[name='type']").val(treeNode.level);// 设置节点类型
         }
         $('#dictionaryModal').modal();
