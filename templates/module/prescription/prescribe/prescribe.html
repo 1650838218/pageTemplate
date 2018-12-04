@@ -8,94 +8,123 @@
     <link rel="stylesheet" href="static/zTree_v3/css/bootstrapStyle/bootstrapStyle.css">
     <link rel="stylesheet" href="static/tag-it/css/jquery.tagit.css">
     <link rel="stylesheet" href="static/tag-it/css/tagit.ui-zendesk.css">
+    <style type="text/css">
+        .col-md-3 , .form-panel{
+            background-color: white;
+            border-radius: 6px;
+        }
+        .col-md-9 {
+            padding-right: 0px;
+        }
+        .tree-panel input {
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+        .blank-text {
+            height: 100px;
+            text-align: center;
+            line-height: 100px;
+            display: none;
+        }
+        .form-panel {
+            padding: 0 20px;
+        }
+        .form-panel .form-title {
+            padding: 13px 48px 13px 0;
+            margin: 0;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .form-horizontal {
+            padding: 15px 0;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
+<div class="container-fluid ">
     <div class="row">
         <div class="col-md-3">
             <div class="tree-panel">
-                <form class="form-inline">
-                    <div class="form-group">
-                        <label class="sr-only" >搜索</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="搜索">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                    </button>
-                </form>
+                <!--<form class="form-inline">-->
+                    <!--<div class="form-group">-->
+                        <!--<label class="sr-only" >搜索</label>-->
+                        <input type="text" class="form-control" placeholder="搜索">
+                    <!--</div>-->
+                    <!--<button id="addDiseaseBtn" type="button" class="btn btn-info">-->
+                        <!--<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>-->
+                    <!--</button>-->
+                <!--</form>-->
                 <ul id="diseaseTree" class="ztree"></ul>
-                <div class="blank-text-div">
+                <div class="blank-text">
                     <span>暂无疾病类型。</span>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-9 right-panel">
+        <div class="col-md-9">
             <div class="form-panel">
                 <div class="form-title">
-                    <h2 class="site-h2">处方</h2>
+                    <h4>处方</h4>
                 </div>
-                <div class="blank-text-div">
+                <div class="blank-text">
                     <span>请先添加一种疾病类型。</span>
                 </div>
-                <form class="layui-form" lay-filter="prescribeForm" style="display: none">
+                <form class="form-horizontal" id="prescribeForm">
                     <input type="hidden" name="id">
                     <input type="hidden" name="disease.id">
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">主治病症</label>
-                        <div class="layui-input-inline" style="width: 300px">
-                            <input type="text" name="disease.name" class="layui-input" style="border: none"
-                                   readonly="readonly">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">主治病症</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">email@example.com</p>
+                            <!--<input type="text" name="disease.name" class="form-control" style="border: none" readonly="readonly">-->
                         </div>
                     </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">处方名称</label>
-                        <div class="layui-input-inline" style="width: 300px">
-                            <input type="text" name="name" lay-verify="required" placeholder="请输入名称" maxlength="20"
-                                   class="layui-input">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">处方名称</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="name" placeholder="请输入名称" maxlength="20" class="form-control">
                         </div>
                     </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">处方简称</label>
-                        <div class="layui-input-inline" style="width: 300px">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">处方简称</label>
+                        <div class="col-sm-9">
                             <!--<input type="text" name="abbreviation" lay-verify="required" placeholder="请输入简称" maxlength="20" class="layui-input">-->
-                            <select name="abbreviation" lay-verify="required">
+                            <select class="form-control" name="abbreviation">
                                 <option value=""></option>
-                                <!--<option value="0">写作</option>
-                                <option value="1" selected="">阅读</option>
-                                <option value="2">游戏</option>
-                                <option value="3">音乐</option>
-                                <option value="4">旅行</option>-->
                             </select>
                         </div>
                     </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">处方类型</label>
-                        <div class="layui-input-inline">
-                            <input type="radio" name="type" value="0" title="中药处方" checked="">
-                            <input type="radio" name="type" value="1" title="针灸处方">
-                            <input type="radio" name="type" value="2" title="中成药处方">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">处方类型</label>
+                        <div class="col-sm-9">
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="0" checked=""> 中药处方
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="1"> 针灸处方
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="2"> 中成药处方
+                            </label>
                         </div>
                     </div>
-                    <!--<div class="layui-form-item">
-                        <label class="layui-form-label">处方方歌</label>
-                        <div class="layui-input-inline" style="width: 600px">
-                            <textarea class="layui-textarea" name="doggerel" placeholder="请输入方歌"></textarea>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">处方方歌</label>
+                        <div class="col-sm-9">
+                            <textarea class="form-control" rows="4" name="doggerel" placeholder="请输入方歌"></textarea>
                         </div>
-                    </div>-->
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">处方详情</label>
-                        <div class="layui-input-inline" style="width: 600px">
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">处方详情</label>
+                        <div class="col-sm-9">
                             <input type="text" id="details" name="details" value="" maxlength="500">
                         </div>
                     </div>
-                    <div class="layui-form-item">
-                        <div class="layui-input-block">
-                            <button type="reset" style="display: none">新建</button>
-                            <button type="button" class="layui-btn" lay-submit="" lay-filter="save">保存</button>
-                            <button type="button" class="layui-btn" lay-submit="" lay-filter="saveAndReset">保存并新建</button>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-9">
+                            <button type="reset" class="btn btn-default">重置</button>
+                            <button type="button" class="btn btn-primary" id="save">保存</button>
+                            <button type="button" class="btn btn-primary" id="saveAndReset">保存并新建</button>
                         </div>
                     </div>
                 </form>
@@ -103,30 +132,40 @@
         </div>
     </div>
 </div>
-<div id="layerContent" style="display: none">
-    <div class="form-panel">
-        <input type="hidden" name="id">
-        <input type="hidden" name="pId">
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">所属类别</label>
-                <div class="layui-input-inline" style="width: 300px">
-                    <input type="text" name="belong" class="layui-input no-border" readonly>
-                </div>
+<div class="modal fade" id="diseaseModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">添加疾病类型</h4>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">疾病名称</label>
-                <div class="layui-input-inline" style="width: 300px">
-                    <input type="text" name="name" class="layui-input">
-                </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <input type="hidden" name="id" value="">
+                    <input type="hidden" name="pId" value="">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">所属类别</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">email@example.com</p>
+                            <!--<input type="text" class="form-control" name="name" maxlength="50" placeholder="名称">-->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">疾病名称</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="name" maxlength="50" placeholder="名称">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">保存</button>
             </div>
         </div>
     </div>
 </div>
 <script src="static/zTree_v3/js/jquery.ztree.all.js"></script>
-<!--<script src="static/zTree_v3/js/jquery.ztree.exhide.js"></script>-->
 <script src="static/zTree_v3/js/fuzzysearch.js"></script>
 <script src="static/jquery-ui/jquery-ui.js"></script>
 <script src="static/tag-it/js/tag-it.js" charset="utf-8"></script>

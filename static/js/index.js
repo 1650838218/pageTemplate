@@ -66,19 +66,11 @@ $(function(){
      */
     function addClickEvent() {
         $('nav.main-menu li a').on('click',function (event) {
-            console.log($(this).attr('url'));
+            // console.log($(this).attr('url'));
             var url = $(this).attr('url');
             if (url) {
                 $('#bodyContent').load('templates/module/' + url);
             }
-            /*$.ajax({
-                url : 'templates/module/' + url,
-                cache : true,
-                async : false,
-                success : function(html) {
-                    $("#bodyContent").html(html);
-                }
-            });*/
         });
     }
 });

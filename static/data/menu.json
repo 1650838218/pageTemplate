@@ -43,7 +43,7 @@
 			},
 			{
 				"name": "处方",
-                "url": "javascript:void(0);"
+                "url": "prescription/prescribe/prescribe.html"
 			},
 			{
 				"name": "穴位",

@@ -2,7 +2,7 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: grunt.file.readJSON('disease.json'),
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %> <%= pkg.version %> */\n'
