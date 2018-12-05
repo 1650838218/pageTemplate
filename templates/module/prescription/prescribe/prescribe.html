@@ -38,6 +38,9 @@
         .form-horizontal {
             padding: 15px 0;
         }
+        button {
+            margin: 0px 5px;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +48,7 @@
     <div class="row">
         <div class="col-md-3">
             <div class="tree-panel">
-                <input type="text" class="form-control" placeholder="搜索">
+                <input type="text" class="form-control search-input" placeholder="搜索">
                 <ul id="diseaseTree" class="ztree"></ul>
                 <div class="blank-text">
                     <span>暂无疾病类型。</span>
@@ -61,7 +64,7 @@
                 <div class="blank-text">
                     <span>请先添加一种疾病类型。</span>
                 </div>
-                <form class="form-horizontal" id="prescribeForm">
+                <form class="form-horizontal" id="prescribeForm" style="display: none">
                     <input type="hidden" name="id">
                     <input type="hidden" name="disease.id">
                     <div class="form-group">
@@ -158,6 +161,7 @@
     </div>
 </div>
 <script src="static/zTree_v3/js/jquery.ztree.all.js"></script>
+<script src="static/zTree_v3/js/jquery.ztree.exhide.js"></script>
 <script src="static/zTree_v3/js/fuzzysearch.js"></script>
 <script src="static/jquery-ui/jquery-ui.js"></script>
 <script src="static/tag-it/js/tag-it.js" charset="utf-8"></script>

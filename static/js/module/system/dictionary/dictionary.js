@@ -153,7 +153,7 @@ $(function () {
             }
             $("#dictionaryModal input[name='type']").val(treeNode.level);// 设置节点类型
         }
-        $('#dictionaryModal').modal();
+        $('#dictionaryModal').modal({backdrop:'static'});
     }
     
     /**
@@ -166,7 +166,7 @@ $(function () {
             $("#dictionaryModal input[name='name']").val(treeNode.name);
             $("#dictionaryModal input[name='code']").val(treeNode.code);
         }
-        $('#dictionaryModal').modal();
+        $('#dictionaryModal').modal({backdrop:'static'});
         return false;
     }
 

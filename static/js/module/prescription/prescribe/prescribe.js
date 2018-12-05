@@ -5,26 +5,25 @@ $(function () {
     $.getJSON('static/data/disease.json', loadTree);// /prescription/disease/loadTree
 
     // 模态框隐藏时重置表单
-    $('#dictionaryModal').on('hidden.bs.modal', function (e) {
-        $("#dictionaryModal input").val('');
-        $(".form-horizontal p").html('');
+    $('#diseaseModal').on('hidden.bs.modal', function (e) {
+        $("#diseaseModal input").val('');
+        $("#diseaseModal p").html('');
     });
 
     // 模态框 保存 按钮绑定点击事件
     $('#saveBtn').on('click', saveDiseaseBtnClick);
 
-    // // 新增疾病按钮点击事件
-    // $("#addDiseaseBtn").on('click', {flag: 0}, editDisease);
     // 初始化渲染tag-it 标签
     $('#details').tagit({});
+
     // 监听处方名称输入框的输入事件，方便将处方名称转换成汉语拼音首字母
     var input = $('#prescribeForm').find("input[name='name']");
     var select = $('#prescribeForm').find("select[name='abbreviation']");
     input.keyup({input:input,select:select},toPinYin);
+
     // 处方 保存按钮监听事件
     $('#save').on('click', savePrescribe);
     $('#saveAndReset').on('click', saveAndResetPrescribe);
-
 
     // ztree 参数设置
     var setting = {
@@ -148,16 +147,16 @@ $(function () {
             var parentNode = treeNode.getParentNode();
             if (parentNode) {
                 // 非根节点下添加
-                $("#dictionaryModal input[name='pId']").val(parentNode.pId);// 设置pId
+                $("#diseaseModal input[name='pId']").val(parentNode.pId);// 设置pId
                 $(".form-horizontal p").html(getAncestorNodes(treeNode, '', 0));// 设置 所属类别
             } else {
                 // 在根节点下添加
-                $("#dictionaryModal input[name='pId']").val(0);// 设置pId
+                $("#diseaseModal input[name='pId']").val(0);// 设置pId
                 $(".form-horizontal p").html('顶级');// 设置 所属类别
             }
-            // $("#dictionaryModal input[name='type']").val(treeNode.level);// 设置节点类型
+            // $("#diseaseModal input[name='type']").val(treeNode.level);// 设置节点类型
         }
-        $('#dictionaryModal').modal();
+        $('#diseaseModal').modal({backdrop:'static'});
     }
     /**
      * 疾病编辑
@@ -165,11 +164,11 @@ $(function () {
      */
     function editDisease(treeId, treeNode) {
         if (treeNode != null) {
-            $('#dictionaryModal').find("input[name='id']").val(treeNode.id);
-            $('#dictionaryModal').find("input[name='pId']").val(treeNode.pId);
-            $('#dictionaryModal').find("input[name='name']").val(treeNode.name);
+            $('#diseaseModal').find("input[name='id']").val(treeNode.id);
+            $('#diseaseModal').find("input[name='pId']").val(treeNode.pId);
+            $('#diseaseModal').find("input[name='name']").val(treeNode.name);
             $('.form-horizontal p').html(getAncestorNodes(treeNode, '', 1));
-            $('#dictionaryModal').modal();
+            $('#diseaseModal').modal({backdrop:'static'});
             // showEditWindow({title: '修改疾病类型'}, {save: saveDisease, validate: validate});
         }
     }
@@ -191,7 +190,7 @@ $(function () {
         if (flag == 0) {
             str = connector + newNode.name;
         }
-        while (newNode.getParentNode() != null) {
+        while (newNode.getParentNode().getParentNode() != null) {
             var parentNode = newNode.getParentNode();
             str = connector + parentNode.name + str;
             newNode = parentNode;
@@ -217,7 +216,7 @@ $(function () {
             // 根节点
             // 隐藏表单，显示提示信息
             $('.form-panel form').hide();
-            $('.form-panel .blank-text').html('请选择一个疾病类型或处方');
+            $('.form-panel .blank-text').html('请选择一个疾病类型或处方！');
             $('.form-panel .blank-text').show();
         } else if (treeNode.type == 0) {
             //  疾病类型
@@ -228,7 +227,7 @@ $(function () {
             $('.form-panel').find(("select[name='abbreviation']")).empty();
             $('#details').tagit('removeAll');
             $(".form-panel input[name='disease.id']").val(treeNode.id);
-            $('.form-panel p').html(getAncestorNodes(treeNode,'',1));
+            $('.form-panel p').html(getAncestorNodes(treeNode,'',0));
         } else {
             //  处方
             //  显示表单，隐藏提示信息，赋值
@@ -239,7 +238,7 @@ $(function () {
             $('#details').tagit('removeAll');
             $(".form-panel input[name='id']").val(treeNode.id);
             $(".form-panel input[name='disease.id']").val(treeNode.getParentNode().id);
-            $('.form-panel p').html(getAncestorNodes(treeNode,'',0));
+            $('.form-panel p').html(getAncestorNodes(treeNode,'',1));
             $(".form-panel input[name='name']").val(treeNode.name);
             $(".form-panel select[name='abbreviation']").val(treeNode.abbreviation);
             $(".form-panel input[name='type']").val(treeNode.type);
@@ -248,10 +247,12 @@ $(function () {
             // 动态初始化 select和tag
             var select = $('.form-panel').find(("select[name='abbreviation']"));
             select.append('<option value="'+ treeNode.abbreviation +'" selected>'+ treeNode.abbreviation +'</option>');
-            var tags = treeNode.details.split(',');
-            $.each(tags, function (index, tag) {
-                $('#details').tagit('createTag', tag);
-            });
+            if (treeNode.details) {
+                var tags = treeNode.details.split(',');
+                $.each(tags, function (index, tag) {
+                    $('#details').tagit('createTag', tag);
+                });
+            }
         }
     }
 
@@ -309,15 +310,15 @@ $(function () {
      * 模态框 保存 按钮点击事件
      */
     function saveDiseaseBtnClick() {
-        $('#dictionaryModal form').bootstrapValidator('validate');// 触发校验
-        var flag = $('#dictionaryModal form').data('bootstrapValidator').isValid();// 获取校验结果
+        $('#diseaseModal form').bootstrapValidator('validate');// 触发校验
+        var flag = $('#diseaseModal form').data('bootstrapValidator').isValid();// 获取校验结果
         if (flag) {
-            saveDisease($('#dictionaryModal form').serialize());
+            saveDisease($('#diseaseModal form').serialize());
         }
     }
 
     // 表单验证
-    $('#dictionaryModal form').bootstrapValidator({
+    $('#diseaseModal form').bootstrapValidator({
         message: 'This value is not valid',
         feedbackIcons: {
             valid: 'glyphicon glyphicon-ok',
@@ -330,13 +331,6 @@ $(function () {
                 validators: {
                     notEmpty: {
                         message: '名称不能为空！'
-                    }
-                }
-            },
-            pId: {
-                validators: {
-                    notEmpty: {
-                        message: 'pId不能为空！'
                     }
                 }
             }
@@ -449,13 +443,15 @@ $(function () {
             var input = event.data.input;
             var select = event.data.select;
             var val = input.val().trim();
-            if (val == '') return;
+            if (val == '') {
+                select.empty();// 清空下拉框
+                return;
+            }
             var arrRslt = makePy(val);
             select.empty();
             for (var i = 0; i < arrRslt.length; i++) {
                 select.append('<option value="'+ arrRslt[i] +'">'+ arrRslt[i] +'</option>');
             }
-            layui.form.render('select');
         }
     }
 });
