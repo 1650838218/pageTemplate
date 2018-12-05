@@ -209,27 +209,42 @@ $(function () {
      * @param treeNode
      */
     function onClick(event, treeId, treeNode) {
-        var form = layui.form;
-        $('.form-panel').find("form[lay-filter='prescribeForm']").show();
-        $('.form-panel').find("button[type='reset']").click();
-        $('.form-panel').find(("select[name='abbreviation']")).empty();
-        $('#details').tagit('removeAll');
-        if (treeNode.isDisease) {// 疾病类型
-            // 重置表单，初始化疾病名称和diseaseId
-            form.val('prescribeForm', {
-                'disease.name': getAncestorNodes(treeNode, '', 0),
-                'disease.id': treeNode.id,
-                'id':''
-            });
-        } else {// 处方
-            form.val('prescribeForm', {
-                'disease.name': getAncestorNodes(treeNode.getParentNode(), '', 0),
-                'disease.id': treeNode.getParentNode().id,
-                'id': treeNode.id,
-                'name': treeNode.name,
-                // 'abbreviation': treeNode.abbreviation,
-                'type': treeNode.type
-            });
+        // 判断点击的节点的类型
+        // 1. 根节点 ：右侧显示提示信息（请选择一个疾病类型或处方）
+        // 2. 疾病类型 ：右侧显示空白表单
+        // 3. 处方 ：右侧显示该处方的详细信息
+        if (treeNode.getParentNode() == null) {
+            // 根节点
+            // 隐藏表单，显示提示信息
+            $('.form-panel form').hide();
+            $('.form-panel .blank-text').html('请选择一个疾病类型或处方');
+            $('.form-panel .blank-text').show();
+        } else if (treeNode.type == 0) {
+            //  疾病类型
+            //  显示表单，隐藏提示信息，reset表单，赋值pId
+            $('.form-panel .blank-text').hide();
+            $('.form-panel form').show();
+            $(".form-panel button[type='reset']").click();
+            $('.form-panel').find(("select[name='abbreviation']")).empty();
+            $('#details').tagit('removeAll');
+            $(".form-panel input[name='disease.id']").val(treeNode.id);
+            $('.form-panel p').html(getAncestorNodes(treeNode,'',1));
+        } else {
+            //  处方
+            //  显示表单，隐藏提示信息，赋值
+            $('.form-panel .blank-text').hide();
+            $('.form-panel form').show();
+            $(".form-panel button[type='reset']").click();
+            $('.form-panel').find(("select[name='abbreviation']")).empty();
+            $('#details').tagit('removeAll');
+            $(".form-panel input[name='id']").val(treeNode.id);
+            $(".form-panel input[name='disease.id']").val(treeNode.getParentNode().id);
+            $('.form-panel p').html(getAncestorNodes(treeNode,'',0));
+            $(".form-panel input[name='name']").val(treeNode.name);
+            $(".form-panel select[name='abbreviation']").val(treeNode.abbreviation);
+            $(".form-panel input[name='type']").val(treeNode.type);
+            $(".form-panel input[name='doggerel']").val(treeNode.doggerel);
+            $(".form-panel input[name='details']").val(treeNode.details);
             // 动态初始化 select和tag
             var select = $('.form-panel').find(("select[name='abbreviation']"));
             select.append('<option value="'+ treeNode.abbreviation +'" selected>'+ treeNode.abbreviation +'</option>');
