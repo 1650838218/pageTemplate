@@ -20,8 +20,8 @@
 				"url": "javascript:void(0);"
 			},
 			{
-				"name": "进货单",
-				"url": "javascript:void(0);"
+				"name": "采购入库",
+				"url": "dispensary/order/order.html"
 			},
 			{
 				"name": "库存",
