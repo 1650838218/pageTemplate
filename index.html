@@ -9,6 +9,7 @@
 	<link rel='stylesheet' href="static/css/style.css" />
 	<link rel='stylesheet' href="static/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/iconfont/iconfont.css" />
+	<link rel="stylesheet" href="static/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css">
     <script src="static/js/modernizr.js"></script>
 </head>
 <body class="dashboard-page">
@@ -32,6 +33,7 @@
 						<i class="fa fa-angle-right"></i>
 						<span>Blank</span>
 					</h2>
+					<input type="text" id="dateTest1" class="form-control" name="dataRange" placeholder="日期范围">
 				</div>
 				<!-- 主界面 -->
                 <div id="bodyContent" class="content"></div>
@@ -47,6 +49,10 @@
     <script src="static/layer/layer.js"></script>
     <script src="static/js/index.js"></script>
 	<script src="static/js/common/constant.js"></script>
+	<script src="static/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+<script>
+    $("#dateTest1").datetimepicker();
+</script>
 </body>
 </html>
 .
