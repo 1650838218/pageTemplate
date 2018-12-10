@@ -1,6 +1,7 @@
 {
   "init": true,
-  "dateRange": "2018-10 至 2018-12",
+  "startDate": "2018-10",
+  "endDate": "2018-12",
   "content": [
     {
       "id":1,

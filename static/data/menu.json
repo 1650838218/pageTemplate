@@ -14,7 +14,7 @@
 	{
 		"name": "药房管理",
 		"icon": "icon iconfont icon-yaofangguanli1",
-		"url": "dispensary/order/order.html",
+		"url": "javascript:void(0);",
 		"children": [{
 				"name": "进货商名片",
 				"url": "javascript:void(0);"

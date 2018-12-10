@@ -3,34 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <title>采购入库</title>
-    <link rel="stylesheet" href="static/bootstrap-select/css/bootstrap-select.min.css">
-    <link rel="stylesheet" href="static/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css">
+    <style type="text/css">
+        .form-search {
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+        .form-search input.form-control[readonly] {
+            background-color: #fff;
+            width: 130px;
+        }
+        .form-search label {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
 <div class="container-fluid">
     <form class="form-inline form-search">
         <div class="form-group">
             <label>日期范围</label>
-            <input type="text" id="dateTest" class="form-control" name="dataRange" placeholder="日期范围">
+            <input type="text" class="form-control" name="startDate" placeholder="开始年月" readonly>
+            至
+            <input type="text" class="form-control" name="endDate" placeholder="结束年月" readonly>
         </div>
         <div class="form-group">
-            <label>订单类型</label>
-            <label class="radio-inline">
-                <input type="radio" name="type" value="0">全部
-            </label>
-            <label class="radio-inline">
-                <input type="radio" name="type" value="1">草稿
-            </label>
-            <label class="radio-inline">
-                <input type="radio" name="type" value="2">交付未入库
-            </label>
-            <label class="radio-inline">
-                <input type="radio" name="type" value="3">交付已入库
-            </label>
+            <label style="margin-left: 10px">订单类型</label>
+            <select class="form-control">
+                <option value="0">全部</option>
+                <option value="1">草稿</option>
+                <option value="2">未入库</option>
+                <option value="3">已入库</option>
+            </select>
         </div>
         <div class="form-group">
-            <label>订单名称</label>
-            <select class="selectpicker form-control" data-live-search="true" title="选择订单"></select>
+            <label style="margin-left: 10px">订单名称</label>
+            <select class="selectpicker form-control" data-container="body" data-live-search="true" data-hide-disabled="true" title="选择订单"></select>
         </div>
     </form>
     <!--<div class="row">
@@ -78,8 +85,8 @@
         </div>
     </div>-->
 </div>
-<script src="static/bootstrap-select/js/bootstrap-select.min.js"></script>
-<script src="static/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+<!--<script src="static/bootstrap-select/js/bootstrap-select.min.js"></script>-->
+<!--<script src="static/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>-->
 <script src="static/js/module/dispensary/order/order.js"></script>
 </body>
 </html>
