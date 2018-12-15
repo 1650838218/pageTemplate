@@ -1,6 +1,6 @@
 html,
 body {
-    overflow-x: hidden;
+    /*overflow-x: hidden;*/
     background: #f4f7f9;
     min-width: 300px;
 }
@@ -207,8 +207,8 @@ nav.main-menu .icon-i-arrow-right,
 }
 
 .scrollable {
-    overflow-y: auto;
-    overflow-x: hidden;
+    /*overflow-y: auto;*/
+    /*overflow-x: hidden;*/
     padding-left: 60px;
     -webkit-overflow-scrolling: touch;
 }

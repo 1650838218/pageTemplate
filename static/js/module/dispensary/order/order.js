@@ -4,19 +4,35 @@ $(function () {
     // 后台根据默认条件查询订单，默认条件：最近三个月的未入库订单
     $.getJSON('static/data/order.json', {}, loadOrder);
 
+    $('.form-search .form-control').on('change',reloadOrder);
+
+    // 初始化日期控件
+    initDatetimepicker();
+
+    /**
+     * 查询参数改变后重新加载订单
+     */
+    function reloadOrder() {
+        var data = {};
+        $('.form-search .form-control').each(function (index,element) {
+            var name = $(element).attr('name');
+            var val = $(element).val();
+            console.log(element);
+            data[name] = val;
+        });
+        // console.log(data);
+        $.getJSON('static/data/order.json', data, loadOrder);
+    }
 
     /**
      * 加载订单
      * @param data
      */
     function loadOrder(data) {
-        if (data.init) {
             // 初始化日期选择器和单选按钮
-            initDatetimepicker();
-            $(".form-search input[name='startDate']").val(data.startDate);
-            $(".form-search input[name='endDate']").val(data.endDate);
-            $(".form-search input[type='radio'][name='type'][value='2']").attr('checked', true);
-        }
+        $(".form-search input[name='startDate']").val(data.startDate);
+        $(".form-search input[name='endDate']").val(data.endDate);
+        $(".form-search select[name='type']").val(data.type);
         initSelectPicker(data.content);
     }
 
@@ -38,7 +54,7 @@ $(function () {
         }
         _options = options.join('');
         $('.form-search .selectpicker')[0].innerHTML = _options;
-        // $('.form-search .selectpicker').selectpicker('val', ['Mustard', 'Relish']);
+        $('.form-search .selectpicker').selectpicker('render');
     }
 
     /**
@@ -48,6 +64,8 @@ $(function () {
     function initDatetimepicker(value) {
         var option = {
             format: 'yyyy-mm',
+            autoclose:true,
+            todayHighlight:true,
             startView: 3,
             minView: 3
         };
