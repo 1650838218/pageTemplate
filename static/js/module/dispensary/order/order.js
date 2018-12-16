@@ -4,7 +4,7 @@ $(function () {
     // 后台根据默认条件查询订单，默认条件：最近三个月的未入库订单
     $.getJSON('static/data/order.json', {}, loadOrder);
 
-    $('.form-search .form-control').on('change',reloadOrder);
+    $('.div-search .form-control').on('change',reloadOrder);
 
     // 初始化日期控件
     initDatetimepicker();
@@ -14,7 +14,7 @@ $(function () {
      */
     function reloadOrder() {
         var data = {};
-        $('.form-search .form-control').each(function (index,element) {
+        $('.div-search .form-control').each(function (index,element) {
             var name = $(element).attr('name');
             var val = $(element).val();
             console.log(element);
@@ -30,9 +30,9 @@ $(function () {
      */
     function loadOrder(data) {
             // 初始化日期选择器和单选按钮
-        $(".form-search input[name='startDate']").val(data.startDate);
-        $(".form-search input[name='endDate']").val(data.endDate);
-        $(".form-search select[name='type']").val(data.type);
+        $(".div-search input[name='startDate']").val(data.startDate);
+        $(".div-search input[name='endDate']").val(data.endDate);
+        $(".div-search select[name='type']").val(data.type);
         initSelectPicker(data.content);
     }
 
@@ -53,8 +53,8 @@ $(function () {
             options.push(option);
         }
         _options = options.join('');
-        $('.form-search .selectpicker')[0].innerHTML = _options;
-        $('.form-search .selectpicker').selectpicker('render');
+        $('.div-search .selectpicker')[0].innerHTML = _options;
+        $('.div-search .selectpicker').selectpicker('render');
     }
 
     /**
@@ -69,8 +69,8 @@ $(function () {
             startView: 3,
             minView: 3
         };
-        var startDate = $(".form-search input[name='startDate']");
-        var endDate = $(".form-search input[name='endDate']");
+        var startDate = $(".div-search input[name='startDate']");
+        var endDate = $(".div-search input[name='endDate']");
         startDate.datetimepicker(option).on('click', function (e) {
             startDate.datetimepicker("setEndDate", endDate.val());
         });
