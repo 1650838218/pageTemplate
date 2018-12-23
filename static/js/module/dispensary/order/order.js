@@ -9,6 +9,23 @@ $(function () {
     // 初始化日期控件
     initDatetimepicker();
 
+    $('#orderTable').bootstrapTable({
+        url: '',
+        columns: orderTableColumns,
+    });
+
+    // 订单下拉框的change事件
+    $('.div-search .selectpicker').on('change',loadOrderDetail);
+
+    /**
+     * 加载订单明细
+     * @param even
+     */
+    function loadOrderDetail(even) {
+        var orderId = $('.div-search .selectpicker').val();
+
+    }
+    
     /**
      * 查询参数改变后重新加载订单
      */
@@ -79,4 +96,66 @@ $(function () {
         });
     }
 
+    // 定义表格列
+    var orderTableColumns = [{
+        field: 'name',
+        title: '名称'
+    }, {
+        field: 'type',
+        title: '类型'
+    }, {
+        field: 'specifications',
+        title: '规格'
+    }, {
+        field: 'count',
+        title: '数量'
+    }, {
+        field: 'unitPrice',
+        title: '单价'
+    }, {
+        field: 'productionDate',
+        title: '生产日期'
+    }, {
+        field: 'effectiveDate',
+        title: '有效期至'
+    }, {
+        field: 'producer',
+        title: '生产企业'
+    }, {
+        field: 'totalPrice',
+        title: '总价'
+    }];
+
+    /**
+     * 表格操作列
+     * @param value
+     * @param row
+     * @param index
+     * @returns {string}
+     */
+    function operateFormatter(value, row, index) {
+        return [
+            '<a class="like" href="javascript:void(0)" title="Like">',
+            '<i class="fa fa-heart-o"></i>',
+            '</a>  ',
+            '<a class="remove" href="javascript:void(0)" title="Remove">',
+            '<i class="fa fa-trash"></i>',
+            '</a>'
+        ].join('');
+    }
+
+    /**
+     * 表格操作列按钮点击事件
+     */
+    window.operateEvents = {
+        'click .like': function (e, value, row, index) {
+            alert('You click like action, row: ' + JSON.stringify(row));
+        },
+        'click .remove': function (e, value, row, index) {
+            $table.bootstrapTable('remove', {
+                field: 'id',
+                values: [row.id]
+            });
+        }
+    };
 });

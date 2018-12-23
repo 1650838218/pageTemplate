@@ -14,6 +14,10 @@ h6 {
     margin: 0;
 }
 
+label {
+    font-weight: normal !important;
+}
+
 body a {
     transition: 0.5s all ease;
     -webkit-transition: 0.5s all ease;
@@ -214,11 +218,7 @@ nav.main-menu .icon-i-arrow-right,
 }
 
 .main-grid {
-    padding: 1em 1.5em 0 1.5em;
-}
-
-.main-grid {
-    padding: 1em;
+    padding: 0.5em;
 }
 
 .banner {

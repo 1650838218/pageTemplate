@@ -13,29 +13,35 @@
             width: 130px;
         }
         .div-search label,
-        .div-info label{
-            margin-right: 10px;
+        .div-detail label{
+            margin-right: 7px;
         }
         .div-search,
-        .div-info {
+        .div-detail {
             margin-left: -15px;
             margin-right: -15px;
             border-radius: 6px;
             background-color: white;
-            margin-top: 15px;
-            padding: 20px 15px 10px 0px;
+            padding: 10px 15px;
         }
-        .div-info .col-sm-3 {
+        .div-detail {
+            margin-top: 10px;
+        }
+        .div-detail .col-sm-3 {
             padding-right: 0px;
         }
         .form-title {
-            margin: 0px 0px 15px 15px;
-            padding-bottom: 10px;
+            margin: 0px 0px 10px 0px;
+            padding-bottom: 8px;
             background: #fff;
             border-bottom: 1px solid #eee;
         }
-        .form-title h4 {
-            font-size: 17px;
+        .form-title h5 {
+            font-weight: 700;
+            display: inline-block;
+        }
+        .form-group {
+            margin-right: 14px;
         }
     </style>
 </head>
@@ -43,7 +49,8 @@
 <div class="container-fluid">
     <div class="div-search">
         <div class="form-title">
-            <h4>订单信息</h4>
+            <h5>查询订单</h5>
+            <span style="float: right" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
         </div>
         <form class="form-inline">
             <div class="form-group">
@@ -53,7 +60,7 @@
                 <input type="text" class="form-control" name="endDate" placeholder="结束年月" readonly>
             </div>
             <div class="form-group">
-                <label style="margin-left: 10px">订单类型</label>
+                <label>订单类型</label>
                 <select class="form-control" name="type">
                     <option value="0">全部</option>
                     <option value="1">草稿</option>
@@ -61,14 +68,14 @@
                 </select>
             </div>
             <div class="form-group">
-                <label style="margin-left: 10px">订单名称</label>
+                <label>订单名称</label>
                 <select class="selectpicker" data-live-search="true" title="选择订单"></select>
             </div>
         </form>
     </div>
-    <div class="div-info">
+    <div class="div-detail">
         <div class="form-title">
-            <h4>订单信息</h4>
+            <h5>订单详情</h5>
         </div>
         <form class="form-inline">
             <div class="form-group">
@@ -87,7 +94,27 @@
                 <label class="control-label">总价</label>
                 <input type="text" class="form-control" name="date" placeholder="总价">
             </div>
+            <button style="float: right" type="button" class="btn btn-primary">添加</button>
         </form>
+        <div>
+            <table id="orderTable" data-search="true">
+                <thead>
+                    <tr>
+                        <th data-field="name" data-align="center">名称</th>
+                        <!--<th data-field="type" data-align="center" data-width="7%">类型</th>-->
+                        <th data-field="specifications" data-align="center">规格</th>
+                        <th data-field="count" data-align="center" data-width="">数量</th>
+                        <th data-field="unitPrice" data-align="center" data-width="">单价</th>
+                        <!--<th data-field="productionDate" data-align="center">生产日期</th>-->
+                        <!--<th data-field="effectiveDate" data-align="center">有效期至</th>-->
+                        <!--<th data-field="producer" data-align="center">产地/产商</th>-->
+                        <th data-field="totalPrice" data-align="center" data-width="">总价</th>
+                        <th data-field="sellingPrice" data-align="center" data-width="">售价</th>
+                        <th data-field="sellingPrice" data-align="center"  data-width="" data-events="operateEvents" data-formatter="operateFormatter">操作</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
     </div>
     <!--<div class="row">
         <div class="col-md-3">
