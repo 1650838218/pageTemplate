@@ -79,22 +79,40 @@
         </div>
         <form class="form-inline">
             <div class="form-group">
-                <label class="control-label">日期</label>
-                <input type="text" class="form-control" name="date" placeholder="日期">
+                <label class="">日期：</label>
+                <p class="form-control-static" name="date"></p>
+                <!--<input type="text" class="form-control" name="date" placeholder="日期">-->
             </div>
             <div class="form-group">
-                <label class="control-label">供货商</label>
-                <input type="text" class="form-control" name="date" placeholder="供货商">
+                <label class="">供货商：</label>
+                <p class="form-control-static" name="dealer"></p>
+                <!--<input type="text" class="form-control" name="date" placeholder="供货商">-->
             </div>
             <div class="form-group">
-                <label class="control-label">联系方式</label>
-                <input type="text" class="form-control" name="date" placeholder="联系方式">
+                <label class="">联系方式：</label>
+                <p class="form-control-static" name="phone"></p>
+                <!--<input type="text" class="form-control" name="date" placeholder="联系方式">-->
             </div>
             <div class="form-group">
-                <label class="control-label">总价</label>
-                <input type="text" class="form-control" name="date" placeholder="总价">
+                <label class="">总价：</label>
+                <p class="form-control-static" name="totalPrice"></p>
+                <!--<input type="text" class="form-control" name="date" placeholder="总价">-->
             </div>
-            <button style="float: right" type="button" class="btn btn-primary">添加</button>
+            <!--<button style="float: right" type="button" class="btn btn-primary">添加</button>-->
+            <!--<div class="btn-group" >
+                <button type="button" class="btn btn-danger">Action</button>
+                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                </ul>
+            </div>-->
         </form>
         <div>
             <table id="orderTable" data-search="true">
@@ -104,12 +122,12 @@
                         <!--<th data-field="type" data-align="center" data-width="7%">类型</th>-->
                         <th data-field="specifications" data-align="center">规格</th>
                         <th data-field="count" data-align="center" data-width="">数量</th>
-                        <th data-field="unitPrice" data-align="center" data-width="">单价</th>
+                        <th data-field="unitPrice" data-align="center" data-width="">单价(元)</th>
                         <!--<th data-field="productionDate" data-align="center">生产日期</th>-->
                         <!--<th data-field="effectiveDate" data-align="center">有效期至</th>-->
                         <!--<th data-field="producer" data-align="center">产地/产商</th>-->
-                        <th data-field="totalPrice" data-align="center" data-width="">总价</th>
-                        <th data-field="sellingPrice" data-align="center" data-width="">售价</th>
+                        <th data-field="totalPrice" data-align="center" data-width="">总价(元)</th>
+                        <th data-field="sellingPrice" data-align="center" data-width="">售价(元/克(盒))</th>
                         <th data-field="sellingPrice" data-align="center"  data-width="" data-events="operateEvents" data-formatter="operateFormatter">操作</th>
                     </tr>
                 </thead>

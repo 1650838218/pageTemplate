@@ -15,14 +15,23 @@ $(function () {
     });
 
     // 订单下拉框的change事件
-    $('.div-search .selectpicker').on('change',loadOrderDetail);
+    $('.div-search .selectpicker').on('change',queryOrderDetail);
 
     /**
      * 加载订单明细
      * @param even
      */
-    function loadOrderDetail(even) {
+    function queryOrderDetail(even) {
         var orderId = $('.div-search .selectpicker').val();
+        // 根据orderId查询订单和订单明细
+        $.getJSON('/static/data/orderDetail.json',{orderId:orderId}, loadOrderDetail);
+    }
+
+    /**
+     * 加载订单明细
+     * @param data
+     */
+    function loadOrderDetail(data) {
 
     }
     
