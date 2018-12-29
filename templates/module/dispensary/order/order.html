@@ -31,7 +31,7 @@
             padding-right: 0px;
         }
         .form-title {
-            margin: 0px 0px 10px 0px;
+            margin: 0px 0px 5px 0px;
             padding-bottom: 8px;
             background: #fff;
             border-bottom: 1px solid #eee;
@@ -43,6 +43,9 @@
         .form-group {
             margin-right: 14px;
         }
+        .fixed-table-toolbar .bs-bars, .fixed-table-toolbar .columns, .fixed-table-toolbar .search {
+            margin-top: 0px;
+        }
     </style>
 </head>
 <body>
@@ -50,7 +53,7 @@
     <div class="div-search">
         <div class="form-title">
             <h5>查询订单</h5>
-            <span style="float: right" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+            <span id="toggleSearch" style="float: right" class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
         </div>
         <form class="form-inline">
             <div class="form-group">
@@ -71,6 +74,17 @@
                 <label>订单名称</label>
                 <select class="selectpicker" data-live-search="true" title="选择订单"></select>
             </div>
+            <div class="btn-group" style="float: right">
+                <button type="button" class="btn btn-info">添加订单</button>
+                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">下拉按钮</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">修改订单</a></li>
+                    <li><a href="#">删除订单</a></li>
+                </ul>
+            </div>
         </form>
     </div>
     <div class="div-detail">
@@ -81,97 +95,60 @@
             <div class="form-group">
                 <label class="">日期：</label>
                 <p class="form-control-static" name="date"></p>
-                <!--<input type="text" class="form-control" name="date" placeholder="日期">-->
             </div>
             <div class="form-group">
                 <label class="">供货商：</label>
                 <p class="form-control-static" name="dealer"></p>
-                <!--<input type="text" class="form-control" name="date" placeholder="供货商">-->
             </div>
             <div class="form-group">
                 <label class="">联系方式：</label>
                 <p class="form-control-static" name="phone"></p>
-                <!--<input type="text" class="form-control" name="date" placeholder="联系方式">-->
             </div>
             <div class="form-group">
                 <label class="">总价：</label>
                 <p class="form-control-static" name="totalPrice"></p>
-                <!--<input type="text" class="form-control" name="date" placeholder="总价">-->
             </div>
-            <!--<button style="float: right" type="button" class="btn btn-primary">添加</button>-->
-            <!--<div class="btn-group" >
-                <button type="button" class="btn btn-danger">Action</button>
-                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#">Separated link</a></li>
-                </ul>
-            </div>-->
         </form>
         <div>
-            <table id="orderTable" data-search="true">
+            <div id="toolbar">
+                <div class="btn-group" >
+                    <button type="button" class="btn btn-info">添加明细</button>
+                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                        <span class="sr-only">下拉按钮</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">导入订单明细</a></li>
+                        <li><a href="#">下载模板</a></li>
+                    </ul>
+                </div>
+            </div>
+            <table id="orderTable"
+                   data-toolbar="#toolbar"
+                   data-pagination="true"
+                   data-search="true"
+                   data-show-refresh="true"
+                   data-show-columns="true">
                 <thead>
                     <tr>
-                        <th data-field="name" data-align="center">名称</th>
-                        <!--<th data-field="type" data-align="center" data-width="7%">类型</th>-->
-                        <th data-field="specifications" data-align="center">规格</th>
-                        <th data-field="count" data-align="center" data-width="">数量</th>
-                        <th data-field="unitPrice" data-align="center" data-width="">单价(元)</th>
-                        <!--<th data-field="productionDate" data-align="center">生产日期</th>-->
-                        <!--<th data-field="effectiveDate" data-align="center">有效期至</th>-->
-                        <!--<th data-field="producer" data-align="center">产地/产商</th>-->
+                        <th data-field="name" data-align="center" data-width="10%">名称</th>
+                        <th data-field="specifications" data-align="center" data-width="10%">规格</th>
+                        <th data-field="type" data-align="center" data-width="">分类</th>
+                        <th data-field="" data-align="center" data-width="">药品剂型</th>
+                        <th data-field="effectiveDate" data-align="center" data-width="">有效期至</th>
+                        <th data-field="count" data-align="center" data-width="">进货数量</th>
+                        <th data-field="" data-align="center" data-width="">进货单位</th>
+                        <th data-field="unitPrice" data-align="center" data-width="">进货单价(元)</th>
                         <th data-field="totalPrice" data-align="center" data-width="">总价(元)</th>
-                        <th data-field="sellingPrice" data-align="center" data-width="">售价(元/克(盒))</th>
+                        <th data-field="" data-align="center" data-width="">加成(%)</th>
+                        <th data-field="sellingPrice" data-align="center" data-width="">售价(元)</th>
+                        <th data-field="" data-align="center" data-width="">销售单位</th>
                         <th data-field="sellingPrice" data-align="center"  data-width="" data-events="operateEvents" data-formatter="operateFormatter">操作</th>
                     </tr>
                 </thead>
             </table>
         </div>
     </div>
-    <!--<div class="row">
-        <div class="col-md-3">
-            <div class="form-info">
-                <div class="form-title">
-                    <h4>订单信息</h4>
-                </div>
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">日期</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" name="date" placeholder="日期">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">供货商</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" name="date" placeholder="供货商">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">联系方式</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" name="date" placeholder="联系方式">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">总价</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" name="date" placeholder="总价">
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="col-md-9">
-
-        </div>
-    </div>-->
 </div>
 <script src="static/js/module/dispensary/order/order.js"></script>
 </body>

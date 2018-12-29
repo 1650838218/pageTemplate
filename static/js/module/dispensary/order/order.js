@@ -3,19 +3,26 @@
 $(function () {
     // 后台根据默认条件查询订单，默认条件：最近三个月的未入库订单
     $.getJSON('static/data/order.json', {}, loadOrder);
-
-    $('.div-search .form-control').on('change',reloadOrder);
-
+    // 订单查询条件改变事件
+    $('.div-search .form-control').on('change', reloadOrder);
     // 初始化日期控件
     initDatetimepicker();
-
-    $('#orderTable').bootstrapTable({
-        url: '',
-        columns: orderTableColumns,
-    });
-
+    // 初始化表格
+    $('#orderTable').bootstrapTable();
     // 订单下拉框的change事件
-    $('.div-search .selectpicker').on('change',queryOrderDetail);
+    $('.div-search .selectpicker').on('change', queryOrderDetail);
+    // 切换查询条件 显示/隐藏 的状态
+    $('#toggleSearch').on('click',function () {
+        $('.div-search form').toggle();
+        if ($('.div-search form').is(':hidden')) {
+            // 隐藏
+            $(this).removeClass('glyphicon-chevron-down');
+            $(this).addClass('glyphicon-chevron-up');
+        } else {
+            $(this).removeClass('glyphicon-chevron-up');
+            $(this).addClass('glyphicon-chevron-down');
+        }
+    });
 
     /**
      * 加载订单明细
@@ -24,7 +31,7 @@ $(function () {
     function queryOrderDetail(even) {
         var orderId = $('.div-search .selectpicker').val();
         // 根据orderId查询订单和订单明细
-        $.getJSON('/static/data/orderDetail.json',{orderId:orderId}, loadOrderDetail);
+        $.getJSON('/static/data/orderDetail.json', {orderId: orderId}, loadOrderDetail);
     }
 
     /**
@@ -32,15 +39,19 @@ $(function () {
      * @param data
      */
     function loadOrderDetail(data) {
-
+        $('.div-detail form p[name="date"]').html(data.date);
+        $('.div-detail form p[name="dealer"]').html(data.dealer);
+        $('.div-detail form p[name="phone"]').html(data.phone);
+        $('.div-detail form p[name="totalPrice"]').html(data.totalPrice + '元');
+        $('#orderTable').bootstrapTable('load', data.orderDetail);// 表格
     }
-    
+
     /**
      * 查询参数改变后重新加载订单
      */
     function reloadOrder() {
         var data = {};
-        $('.div-search .form-control').each(function (index,element) {
+        $('.div-search .form-control').each(function (index, element) {
             var name = $(element).attr('name');
             var val = $(element).val();
             console.log(element);
@@ -55,7 +66,7 @@ $(function () {
      * @param data
      */
     function loadOrder(data) {
-            // 初始化日期选择器和单选按钮
+        // 初始化日期选择器和单选按钮
         $(".div-search input[name='startDate']").val(data.startDate);
         $(".div-search input[name='endDate']").val(data.endDate);
         $(".div-search select[name='type']").val(data.type);
@@ -81,6 +92,7 @@ $(function () {
         _options = options.join('');
         $('.div-search .selectpicker')[0].innerHTML = _options;
         $('.div-search .selectpicker').selectpicker('render');
+        $('.div-search .selectpicker').change();
     }
 
     /**
@@ -90,8 +102,8 @@ $(function () {
     function initDatetimepicker(value) {
         var option = {
             format: 'yyyy-mm',
-            autoclose:true,
-            todayHighlight:true,
+            autoclose: true,
+            todayHighlight: true,
             startView: 3,
             minView: 3
         };
@@ -106,65 +118,41 @@ $(function () {
     }
 
     // 定义表格列
-    var orderTableColumns = [{
-        field: 'name',
-        title: '名称'
-    }, {
-        field: 'type',
-        title: '类型'
-    }, {
-        field: 'specifications',
-        title: '规格'
-    }, {
-        field: 'count',
-        title: '数量'
-    }, {
-        field: 'unitPrice',
-        title: '单价'
-    }, {
-        field: 'productionDate',
-        title: '生产日期'
-    }, {
-        field: 'effectiveDate',
-        title: '有效期至'
-    }, {
-        field: 'producer',
-        title: '生产企业'
-    }, {
-        field: 'totalPrice',
-        title: '总价'
-    }];
+    // 药品属性：药品名称，药品规格，药品分类，药品剂型，拼音简码，条形码，产地/厂家，生产日期，有效期至
+    // 订单属性：进货数量，进货单位，进货单价，总价
+    // 销售属性：零售单位，入库售价加成%，零售单价
 
-    /**
-     * 表格操作列
-     * @param value
-     * @param row
-     * @param index
-     * @returns {string}
-     */
-    function operateFormatter(value, row, index) {
-        return [
-            '<a class="like" href="javascript:void(0)" title="Like">',
-            '<i class="fa fa-heart-o"></i>',
-            '</a>  ',
-            '<a class="remove" href="javascript:void(0)" title="Remove">',
-            '<i class="fa fa-trash"></i>',
-            '</a>'
-        ].join('');
-    }
-
-    /**
-     * 表格操作列按钮点击事件
-     */
-    window.operateEvents = {
-        'click .like': function (e, value, row, index) {
-            alert('You click like action, row: ' + JSON.stringify(row));
-        },
-        'click .remove': function (e, value, row, index) {
-            $table.bootstrapTable('remove', {
-                field: 'id',
-                values: [row.id]
-            });
-        }
-    };
 });
+
+/**
+ * 表格操作列
+ * @param value
+ * @param row
+ * @param index
+ * @returns {string}
+ */
+function operateFormatter(value, row, index) {
+    return [
+        '<a class="like" href="javascript:void(0)" title="修改">',
+        '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>',
+        '</a>  ',
+        '<a class="remove" href="javascript:void(0)" title="删除">',
+        '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>',
+        '</a>'
+    ].join('');
+}
+
+/**
+ * 表格操作列按钮点击事件
+ */
+window.operateEvents = {
+    'click .like': function (e, value, row, index) {
+        alert('You click like action, row: ' + JSON.stringify(row));
+    },
+    'click .remove': function (e, value, row, index) {
+        $table.bootstrapTable('remove', {
+            field: 'id',
+            values: [row.id]
+        });
+    }
+};
