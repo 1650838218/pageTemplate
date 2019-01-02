@@ -12,18 +12,385 @@ $(function () {
     // 订单下拉框的change事件
     $('.div-search .selectpicker').on('change', queryOrderDetail);
     // 切换查询条件 显示/隐藏 的状态
-    $('#toggleSearch').on('click',function () {
-        $('.div-search form').toggle();
-        if ($('.div-search form').is(':hidden')) {
-            // 隐藏
-            $(this).removeClass('glyphicon-chevron-down');
-            $(this).addClass('glyphicon-chevron-up');
+    $('#toggleSearch').on('click',toggleSearch);
+    // 下拉按钮监听事件
+    $('#orderModal').on('hide.bs.modal',orderModalHide);
+    $('#orderModal').on('show.bs.modal',orderModalShow);
+    $('#saveOrderBtn').on('click',saveOrder);
+    $('#delOrderBtn').on('click',delOrder);
+    $('#orderDetailModal').on('hide.bs.modal',orderDetailModalHide);
+    $('#orderDetailModal').on('show.bs.modal',orderDetailModalShow);
+    $('#saveOrderDetailBtn').on('click',saveOrderDetail);
+    $('#delOrderDetailBtn').on('click',delOrderDetail);
+
+    // 订单模态框隐藏时重置表单
+    function orderModalHide(event) {
+        $("#orderModal input").val('');
+        $("#orderModal select").val('');
+        $('#orderModal form').data('bootstrapValidator').resetForm(true);// 清空校验
+    };
+
+    // 订单模态框显示时修改标题
+    function orderModalShow(event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var recipient = button.data('whatever'); // Extract info from data-* attributes
+        var modal = $(this);
+        if (recipient == 'create') {
+            modal.find('.modal-title').text('新建订单');
+            addOrder();
+        } else if (recipient == 'update') {
+            modal.find('.modal-title').text('修改订单');
+            editOrder();
+        }
+    };
+
+    // 订单模态框隐藏时重置表单
+    function orderDetailModalHide(event) {
+        // $("#orderModal input").val('');
+        // $("#orderModal select").val('');
+        // $('#orderDetailModal form').data('bootstrapValidator').resetForm(true);// 清空校验
+    };
+
+    // 订单模态框显示时修改标题
+    function orderDetailModalShow(event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var recipient = button.data('whatever'); // Extract info from data-* attributes
+        var modal = $(this);
+        if (recipient == 'create') {
+            modal.find('.modal-title').text('添加明细');
+            addOrderDetail();
+        } else if (recipient == 'update') {
+            modal.find('.modal-title').text('修改明细');
+            editOrderDetail();
+        }
+    };
+
+    /**
+     * 添加订单明细
+     */
+    function addOrderDetail() {
+
+    }
+
+    /**
+     * 修改订单明细
+     */
+    function editOrderDetail() {
+
+    }
+
+    /**
+     * 删除订单明细
+     */
+    function delOrderDetail() {
+        
+    }
+
+    /**
+     * 保存订单明细
+     */
+    function saveOrderDetail() {
+        
+    }
+    
+    /**
+     * 删除订单
+     */
+    function delOrder() {
+        // 获取当前选中的订单
+        var orderId = $('.div-search .selectpicker').val();
+        if (orderId) {
+            var orderName = $('.div-search .selectpicker option:selected').text();
+            var msg = MSG.delete_confirm + '名为' + orderName + '的订单吗?';
+            var url = '/prescription/prescribe/delete/';
+            layer.confirm(msg, {icon: 3, title: BTN.delete}, function (index) {
+                $.ajax({
+                    url: url + orderId,
+                    type: 'DELETE',
+                    success: function (data, textStatus, jqXHR) {
+                        layer.msg(MSG.delete_success, {offset: 'rb', time: 2000});
+                        $('.div-search .selectpicker option[value="' + orderId + '"]').remove();
+                        $('.div-search .selectpicker option:first').prop("selected", 'selected');
+                        $('.div-search .selectpicker').selectpicker('render');
+                        $('.div-search .selectpicker').change();
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
+                    }
+                });
+                layer.close(index);
+            });
         } else {
-            $(this).removeClass('glyphicon-chevron-up');
-            $(this).addClass('glyphicon-chevron-down');
+            layer.msg('请先选择一条订单记录', {offset: 'auto', time: 2000});
+        }
+    }
+    
+    /**
+     * 保存订单
+     */
+    function saveOrder() {
+        $('#orderModal form').bootstrapValidator('validate');// 触发校验
+        var flag = $('#orderModal form').data('bootstrapValidator').isValid();// 获取校验结果
+        if (flag) {
+            $.post('/static/data/orderDetail.json',$('#orderModal form').serialize(),function (result) {
+                if (result.success) {
+                    layer.msg(MSG.save_success, {offset: 'rb', time: 2000});
+                    $('.div-search .selectpicker option[value="' + result.data.id + '"]').html(result.data.name);
+                    $('.div-detail form p[name="date"]').html(result.data.date);
+                    $('.div-detail form p[name="dealer"]').html(result.data.dealer);
+                    $('.div-detail form p[name="phone"]').html(result.data.phone);
+                    $('.div-detail form p[name="totalPrice"]').html(result.data.totalPrice + '元');
+                    $('#orderModal').modal('hide');
+                } else {
+                    layer.msg(MSG.save_fail, {offset: 'rb', time: 2000});
+                }
+            },'json');
+        }
+    }
+
+    // 表单验证
+    $('#orderModal form').bootstrapValidator({
+        message: 'This value is not valid',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            name: {
+                // message: '名称验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '名称不能为空'
+                    }
+                }
+            },
+            date: {
+                validators: {
+                    notEmpty: {
+                        message: '日期不能为空'
+                    }
+                }
+            },
+            dealer: {
+                validators: {
+                    notEmpty: {
+                        message: '供应商不能为空'
+                    }
+                }
+            },
+            phone: {
+                validators: {
+                    phone: {
+                        country: 'CN',
+                        message: '请输入正确的电话或手机号码'
+                    }
+                }
+            },
+            totalPrice: {
+                validators: {
+                    notEmpty: {
+                        message: '总价不能为空'
+                    },
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
+                        message: '请输入非负的两位小数'
+                    }
+                }
+            }
         }
     });
 
+    // 表单验证
+    $('#orderDetailModal form').bootstrapValidator({
+        message: 'This value is not valid',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            barCode:{
+              validators: {
+                  stringLength: {
+                      max: 50,
+                      message:'最多输入50个字符'
+                  }
+              }
+            },
+            name: {
+                // message: '名称验证失败',
+                validators: {
+                    notEmpty: {
+                        message: '名称不能为空'
+                    },
+                    stringLength: {
+                        max:20,
+                        message:'最多输入20个字符'
+                    }
+                }
+            },
+            pinyin: {
+                validators: {
+                    notEmpty: {
+                        message: '拼音简称不能为空'
+                    }
+                }
+            },
+            specifications: {
+                validators: {
+                    stringLength: {
+                        max: 50,
+                        message: '最多输入50个字符'
+                    }
+                }
+            },
+            type: {
+                validators: {
+                    notEmpty: {
+                        message: '药品分类不能为空'
+                    }
+                }
+            },
+            validDate: {
+                validators: {
+                    notEmpty: {
+                        message: '有效期至不能为空'
+                    }
+                }
+            },
+            producer: {
+                validators: {
+                    stringLength: {
+                        max: 100,
+                        message: '最多输入100个字符'
+                    }
+                }
+            },
+            purchasePrice: {
+                validators: {
+                    notEmpty: {
+                        message: '进价不能为空'
+                    },
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
+                        message: '请输入非负的两位小数'
+                    }
+                }
+            },
+            purchaseCount: {
+                validators: {
+                    notEmpty: {
+                        message: '数量不能为空'
+                    },
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?(\.\d{1})?$)|(^0$)|(^\d\.\d{1}$)/i,
+                        message: '请输入非负的两位小数'
+                    }
+                }
+            },
+            purchaseUnit: {
+                validators: {
+                    notEmpty: {
+                        message: '单位不能为空'
+                    }
+                }
+            },
+            totalPrice: {
+                validators: {
+                    notEmpty: {
+                        message: '总价不能为空'
+                    },
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
+                        message: '请输入非负的两位小数'
+                    }
+                }
+            },
+            sellUnit: {
+                validators: {
+                    notEmpty: {
+                        message: '零售单位不能为空'
+                    }
+                }
+            },
+            unitConvert: {
+                validators: {
+                    notEmpty: {
+                        message: '单位换算不能为空'
+                    },
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?)$/i,
+                        message: '请输入正整数'
+                    }
+                }
+            },
+            profitPercent: {
+                validators: {
+                    regexp: {
+                        regexp:/^(\d|[1-9]\d|100)$/i,
+                        message: '请输入0-100的整数'
+                    }
+                }
+            },
+            phone: {
+                validators: {
+                    phone: {
+                        country: 'CN',
+                        message: '请输入正确的电话或手机号码'
+                    }
+                }
+            },
+            totalPrice: {
+                validators: {
+                    notEmpty: {
+                        message: '总价不能为空'
+                    },
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
+                        message: '请输入非负的两位小数'
+                    }
+                }
+            }
+        }
+    });
+    
+    /**
+     * 添加订单
+     * @param even
+     */
+    function addOrder(even) {
+        $('#orderModal input[name="type"]').val('1');
+        $('#orderModal input[name="date"]').val(new Date().format("yyyy-MM-dd"));
+        $('#orderModal .selectpicker').selectpicker('render');
+        // $('#orderModal').modal({backdrop:'static'});
+    }
+
+    /**
+     * 修改订单
+     * @param even
+     */
+    function editOrder(even) {
+        // 获取当前选中的订单
+        var orderId = $('.div-search .selectpicker').val();
+        if (orderId) {
+            $.getJSON('/static/data/orderDetail.json', {orderId: orderId}, function (data) {
+                // 赋值
+                $('#orderModal input[name="id"]').val(data.id);
+                $('#orderModal input[name="type"]').val(data.type);
+                $('#orderModal input[name="name"]').val(data.name);
+                $('#orderModal input[name="date"]').val(data.date);
+                $('#orderModal .selectpicker').val(data.dealer);
+                $('#orderModal .selectpicker').selectpicker('render');
+                $('#orderModal input[name="phone"]').val(data.phone);
+                $('#orderModal input[name="totalPrice"]').val(data.totalPrice);
+                // $('#orderModal').modal({backdrop: 'static'});// 显示模态框
+            });
+        } else {
+            layer.msg('请先选择一条订单记录', {offset: 'auto', time: 2000});
+        }
+    }
+    
     /**
      * 加载订单明细
      * @param even
@@ -100,21 +467,51 @@ $(function () {
      * @param value
      */
     function initDatetimepicker(value) {
-        var option = {
+        var searchOption = {
             format: 'yyyy-mm',
             autoclose: true,
             todayHighlight: true,
             startView: 3,
             minView: 3
         };
+        var option = {
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayBtn:true,
+            todayHighlight: true,
+            startView: 2,
+            minView: 2
+        };
         var startDate = $(".div-search input[name='startDate']");
         var endDate = $(".div-search input[name='endDate']");
-        startDate.datetimepicker(option).on('click', function (e) {
+        var orderDate = $('#orderModal input[name="date"]');
+        var productionDate = $('#orderDetailModal input[name="productionDate"]');
+        var validDate = $('#orderDetailModal input[name="validDate"]');
+        startDate.datetimepicker(searchOption).on('click', function (e) {
             startDate.datetimepicker("setEndDate", endDate.val());
         });
-        endDate.datetimepicker(option).on('click', function (e) {
+        endDate.datetimepicker(searchOption).on('click', function (e) {
             endDate.datetimepicker("setStartDate", startDate.val());
         });
+        orderDate.datetimepicker(option);
+        productionDate.datetimepicker($.extend( {}, option, {todayBtn: false} ));
+        validDate.datetimepicker($.extend( {}, option, {todayBtn: false} ));
+
+    }
+
+    /**
+     * 切换查询面板的显示隐藏状态
+     */
+    function toggleSearch() {
+        $('.div-search form').toggle();
+        if ($('.div-search form').is(':hidden')) {
+            // 隐藏
+            $(this).removeClass('glyphicon-chevron-down');
+            $(this).addClass('glyphicon-chevron-up');
+        } else {
+            $(this).removeClass('glyphicon-chevron-up');
+            $(this).addClass('glyphicon-chevron-down');
+        }
     }
 
     // 定义表格列
@@ -133,7 +530,7 @@ $(function () {
  */
 function operateFormatter(value, row, index) {
     return [
-        '<a class="like" href="javascript:void(0)" title="修改">',
+        '<a class="like" href="javascript:void(0)" title="修改" data-toggle="modal" data-target="#orderDetailModal" data-whatever="update">',
         '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>',
         '</a>  ',
         '<a class="remove" href="javascript:void(0)" title="删除">',
