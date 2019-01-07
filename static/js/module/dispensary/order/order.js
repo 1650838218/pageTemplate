@@ -333,21 +333,26 @@ $(function () {
                     }
                 }
             },
-            phone: {
+            sellingPrice: {
                 validators: {
-                    phone: {
-                        country: 'CN',
-                        message: '请输入正确的电话或手机号码'
+                    regexp: {
+                        regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
+                        message: '请输入非负的两位小数'
                     }
                 }
             },
-            totalPrice: {
+            stock: {
                 validators: {
-                    notEmpty: {
-                        message: '总价不能为空'
-                    },
                     regexp: {
                         regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
+                        message: '请输入非负的两位小数'
+                    }
+                }
+            },
+            stockWarn: {
+                validators: {
+                    regexp: {
+                        regexp: /(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
                         message: '请输入非负的两位小数'
                     }
                 }
