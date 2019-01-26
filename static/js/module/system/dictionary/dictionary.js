@@ -1,8 +1,11 @@
 /*数据字典*/
 //@ sourceURL=dictionary.js
 $(function () {
+    // 加载菜单
+    $.getJSON('static/data/menu.json',loadMenuTree);
+
     // 查询并加载数据字典 tree
-    $.getJSON('static/data/dictionary.json', loadTree);
+    // $.getJSON('static/data/dictionary.json', loadTree);
     // 模态框隐藏时重置表单
     $('#dictionaryModal').on('hidden.bs.modal', function (e) {
         $("#dictionaryModal input").val('');
@@ -50,41 +53,27 @@ $(function () {
 
     // ztree 参数设置
     var setting = {
-        view: {
-            addHoverDom: addHoverDom,
-            removeHoverDom: removeHoverDom,
-            showLine: false,
-            selectedMulti: false
-        },
-        edit: {
-            enable: true,
-            showRemoveBtn: showRenameAndRemoveBtn,
-            showRenameBtn: showRenameAndRemoveBtn,
-            removeTitle: BTN.delete,
-            renameTitle: BTN.edit
-        },
-        data: {
-            simpleData: {
-                enable: true
-            },
-            key:{
-              name:"showName"
-            }
-        },
-        callback: {
-            beforeEditName: beforeEditName,
-            beforeRemove: beforeRemove
-        }
+
     };
 
+
+
     /**
-     * 是否显示编辑删除按钮
-     * @param treeId
-     * @param treeNode
-     * @returns {boolean}
+     * 加载左侧的菜单树
+     * @param menu
      */
-    function showRenameAndRemoveBtn(treeId, treeNode) {
-        return treeNode.pId != null;
+    function loadMenuTree(menu) {
+        var zNodes = [];
+        if (!!menu) {
+            zNodes = menu.unshift({"name":"公共字典项","children": []});
+        } else {
+            zNodes = zNodes.unshift({"name":"公共字典项","children": []});
+        }
+        var menuTree = $.fn.zTree.init($("#menuTree"), setting, zNodes);
+        menuTree.expandAll(true);
+        // 搜索框内容改变监听事件
+        // fuzzySearch('dictionaryTree', '#searchInput', null, true); //初始化模糊搜索方法
+        // dictionaryTree.selectNode(dictionaryTree.getNodes()[0])
     }
 
     /**
