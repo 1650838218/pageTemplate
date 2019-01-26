@@ -16,17 +16,21 @@ $(function () {
     // 下拉按钮监听事件
     $('#orderModal').on('hide.bs.modal',orderModalHide);
     $('#orderModal').on('show.bs.modal',orderModalShow);
+    $('#editOrderBtn').on('click',editOrder);
     $('#saveOrderBtn').on('click',saveOrder);
     $('#delOrderBtn').on('click',delOrder);
     $('#orderDetailModal').on('hide.bs.modal',orderDetailModalHide);
     $('#orderDetailModal').on('show.bs.modal',orderDetailModalShow);
     $('#saveOrderDetailBtn').on('click',saveOrderDetail);
-    $('#delOrderDetailBtn').on('click',delOrderDetail);
+    // $('#delOrderDetailBtn').on('click',delOrderDetail);
+    $('#storageBtn').on('click',orderStorage);// 订单入库
 
     // 订单模态框隐藏时重置表单
     function orderModalHide(event) {
         $("#orderModal input").val('');
-        $("#orderModal select").val('');
+        $("#orderModal select").each(function (index,ele) {
+            $(ele).find('option:first').prop("selected", 'selected');
+        });
         $('#orderModal form').data('bootstrapValidator').resetForm(true);// 清空校验
     };
 
@@ -40,15 +44,18 @@ $(function () {
             addOrder();
         } else if (recipient == 'update') {
             modal.find('.modal-title').text('修改订单');
-            editOrder();
+            // editOrder();
         }
     };
 
     // 订单模态框隐藏时重置表单
     function orderDetailModalHide(event) {
-        // $("#orderModal input").val('');
-        // $("#orderModal select").val('');
-        // $('#orderDetailModal form').data('bootstrapValidator').resetForm(true);// 清空校验
+        $("#orderDetailModal input").val('');
+        $("#orderDetailModal select").each(function (index,ele) {
+            $(ele).find('option:first').prop("selected", 'selected');
+        });
+        $('#orderDetailModal form select[name="pinyin"]').empty();
+        $('#orderDetailModal form').data('bootstrapValidator').resetForm(true);// 清空校验
     };
 
     // 订单模态框显示时修改标题
@@ -58,10 +65,9 @@ $(function () {
         var modal = $(this);
         if (recipient == 'create') {
             modal.find('.modal-title').text('添加明细');
-            addOrderDetail();
         } else if (recipient == 'update') {
             modal.find('.modal-title').text('修改明细');
-            editOrderDetail();
+            // editOrderDetail(button.data('value'));
         }
     };
 
@@ -69,28 +75,84 @@ $(function () {
      * 添加订单明细
      */
     function addOrderDetail() {
-
+        // 初始化
+        $('#orderModal input[name="type"]').val('1');
+        $('#orderModal input[name="date"]').val(new Date().format("yyyy-MM-dd"));
+        $('#orderModal .selectpicker').selectpicker('render');
     }
 
     /**
      * 修改订单明细
      */
-    function editOrderDetail() {
-
+    editOrderDetail = function(orderDetailId) {
+        if (orderDetailId) {
+            $('#orderDetailModal').find('.modal-title').text('修改明细');
+            try {
+                // 根据ID查询订单明细
+                $.getJSON('/static/data/orderItem.json', {orderDetailId: orderDetailId}, function (data) {
+                    // 赋值
+                    $("#orderDetailModal form").fillData(data);
+                    $('#orderDetailModal').modal({backdrop: 'static'});// 显示模态框
+                });
+            } catch (e) {
+                layer.alert('订单明细查询失败，请联系系统管理员！',{title: '错误',icon: 2});
+            }
+        } else {
+            layer.alert('该订单明细ID为空，请联系系统管理员！',{title: '错误',icon: 2});
+        }
     }
 
     /**
      * 删除订单明细
      */
-    function delOrderDetail() {
-        
+    delOrderDetail = function(e,orderDetailId,row,index) {
+        if (orderDetailId) {
+            var orderName = $('.div-search .selectpicker option:selected').text();
+            var msg = MSG.delete_confirm + '名为' + orderName + '的订单吗?';
+            var url = '/prescription/prescribe/delete/';
+            layer.confirm(msg, {icon: 3, title: BTN.delete}, function (index) {
+                $.ajax({
+                    url: url + orderDetailId,
+                    type: 'DELETE',
+                    success: function (data, textStatus, jqXHR) {
+                        if (data.success) {
+                            layer.msg(MSG.delete_success, {offset: 'rb', time: 2000});
+                            $('#orderTable').bootstrapTable('remove', {
+                                field: 'id',
+                                values: [row.id]
+                            });
+                        } else {
+                            layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
+                    }
+                });
+                layer.close(index);
+            });
+        } else {
+            layer.alert('该订单明细ID为空，请联系系统管理员！',{title: '错误',icon: 2});
+        }
     }
 
     /**
      * 保存订单明细
      */
     function saveOrderDetail() {
-        
+        $('#orderDetailModal form').bootstrapValidator('validate');// 触发校验
+        var flag = $('#orderDetailModal form').data('bootstrapValidator').isValid();// 获取校验结果
+        if (flag) {
+            $.post('/static/data/saveOrderDetail.json',$('#orderDetailModal form').serialize(),function (result) {
+                if (result.success) {
+                    layer.msg(MSG.save_success, {offset: 'rb', time: 2000});
+                    queryOrderDetail();// 重新查询订单明细
+                    $('#orderDetailModal').modal('hide');
+                } else {
+                    layer.msg(MSG.save_fail, {offset: 'rb', time: 2000});
+                }
+            },'json');
+        }
     }
     
     /**
@@ -121,7 +183,7 @@ $(function () {
                 layer.close(index);
             });
         } else {
-            layer.msg('请先选择一条订单记录', {offset: 'auto', time: 2000});
+            layer.msg('请先选择一条订单记录！', {offset: 'auto', time: 2000});
         }
     }
     
@@ -136,6 +198,7 @@ $(function () {
                 if (result.success) {
                     layer.msg(MSG.save_success, {offset: 'rb', time: 2000});
                     $('.div-search .selectpicker option[value="' + result.data.id + '"]').html(result.data.name);
+                    $('.div-detail form input[name="orderId"]').html(result.data.id);
                     $('.div-detail form p[name="date"]').html(result.data.date);
                     $('.div-detail form p[name="dealer"]').html(result.data.dealer);
                     $('.div-detail form p[name="phone"]').html(result.data.phone);
@@ -343,6 +406,9 @@ $(function () {
             },
             stock: {
                 validators: {
+                    notEmpty: {
+                        message: '总价不能为空'
+                    },
                     regexp: {
                         regexp:/(^[1-9](\d+)?(\.\d{1,2})?$)|(^0$)|(^\d\.\d{1,2}$)/i,
                         message: '请输入非负的两位小数'
@@ -379,20 +445,19 @@ $(function () {
         // 获取当前选中的订单
         var orderId = $('.div-search .selectpicker').val();
         if (orderId) {
-            $.getJSON('/static/data/orderDetail.json', {orderId: orderId}, function (data) {
-                // 赋值
-                $('#orderModal input[name="id"]').val(data.id);
-                $('#orderModal input[name="type"]').val(data.type);
-                $('#orderModal input[name="name"]').val(data.name);
-                $('#orderModal input[name="date"]').val(data.date);
-                $('#orderModal .selectpicker').val(data.dealer);
-                $('#orderModal .selectpicker').selectpicker('render');
-                $('#orderModal input[name="phone"]').val(data.phone);
-                $('#orderModal input[name="totalPrice"]').val(data.totalPrice);
-                // $('#orderModal').modal({backdrop: 'static'});// 显示模态框
-            });
+            $('#orderModal').find('.modal-title').text('修改订单');
+            try {
+                $.getJSON('/static/data/orderDetail.json', {orderId: orderId}, function (data) {
+                    // 赋值
+                    $('#orderModal form').fillData(data);
+                    $('#orderModal .selectpicker').selectpicker('render');
+                    $('#orderModal').modal({backdrop: 'static'});// 显示模态框
+                });
+            } catch (e) {
+                layer.msg('订单查询失败，请联系系统管理员！', {offset: 'auto', time: 2000});
+            }
         } else {
-            layer.msg('请先选择一条订单记录', {offset: 'auto', time: 2000});
+            layer.msg('请先选择一条订单记录！', {offset: 'auto', time: 2000});
         }
     }
     
@@ -411,6 +476,7 @@ $(function () {
      * @param data
      */
     function loadOrderDetail(data) {
+        $('.div-detail form input[name="orderId"]').html(data.id);
         $('.div-detail form p[name="date"]').html(data.date);
         $('.div-detail form p[name="dealer"]').html(data.dealer);
         $('.div-detail form p[name="phone"]').html(data.phone);
@@ -492,15 +558,27 @@ $(function () {
         var orderDate = $('#orderModal input[name="date"]');
         var productionDate = $('#orderDetailModal input[name="productionDate"]');
         var validDate = $('#orderDetailModal input[name="validDate"]');
-        startDate.datetimepicker(searchOption).on('click', function (e) {
-            startDate.datetimepicker("setEndDate", endDate.val());
-        });
-        endDate.datetimepicker(searchOption).on('click', function (e) {
-            endDate.datetimepicker("setStartDate", startDate.val());
-        });
-        orderDate.datetimepicker(option);
-        productionDate.datetimepicker($.extend( {}, option, {todayBtn: false} ));
-        validDate.datetimepicker($.extend( {}, option, {todayBtn: false} ));
+        startDate.datetimepicker(searchOption)
+            .on('click', function (e) {
+                startDate.datetimepicker("setEndDate", endDate.val());
+            });
+        endDate.datetimepicker(searchOption)
+            .on('click', function (e) {
+                endDate.datetimepicker("setStartDate", startDate.val());
+            });
+        orderDate.datetimepicker(option)
+            .on('hide', function (event) {
+                event.stopPropagation();
+            });
+        ;
+        productionDate.datetimepicker($.extend({}, option, {todayBtn: false}))
+            .on('hide', function (event) {
+                event.stopPropagation();
+            });
+        validDate.datetimepicker($.extend({}, option, {todayBtn: false}))
+            .on('hide', function (event) {
+                event.stopPropagation();
+            });
 
     }
 
@@ -524,6 +602,19 @@ $(function () {
     // 订单属性：进货数量，进货单位，进货单价，总价
     // 销售属性：零售单位，入库售价加成%，零售单价
 
+    /**
+     * 订单入库
+     */
+    function orderStorage() {
+        var orderId = $('.div-detail form input[name="orderId"]').val();
+        if (!!orderId) {
+            // 1.校验总分是否平衡，即订单的总价要与所有明细的和相等
+            // 2.所有的明细都必须要有售价，库存，库存预警
+        } else {
+            layer.alert('订单入库失败！',{title: '错误',icon: 2});
+        }
+    }
+    
 });
 
 /**
@@ -532,13 +623,14 @@ $(function () {
  * @param row
  * @param index
  * @returns {string}
+ *  data-toggle="modal" data-value="' + value + '" data-target="#orderDetailModal" data-whatever="update"
  */
 function operateFormatter(value, row, index) {
     return [
-        '<a class="like" href="javascript:void(0)" title="修改" data-toggle="modal" data-target="#orderDetailModal" data-whatever="update">',
+        '<a class="update" href="javascript:void(0);" title="修改">',
         '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>',
         '</a>  ',
-        '<a class="remove" href="javascript:void(0)" title="删除">',
+        '<a class="remove" href="javascript:void(0);" title="删除">',
         '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>',
         '</a>'
     ].join('');
@@ -548,13 +640,11 @@ function operateFormatter(value, row, index) {
  * 表格操作列按钮点击事件
  */
 window.operateEvents = {
-    'click .like': function (e, value, row, index) {
-        alert('You click like action, row: ' + JSON.stringify(row));
+    'click .update': function (e, value, row, index) {
+        editOrderDetail(value);
+        // alert('You click like action, row: ' + JSON.stringify(value));
     },
     'click .remove': function (e, value, row, index) {
-        $table.bootstrapTable('remove', {
-            field: 'id',
-            values: [row.id]
-        });
+        delOrderDetail(e,value,row,index);
     }
 };
