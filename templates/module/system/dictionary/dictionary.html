@@ -56,96 +56,51 @@
         <div class="col-md-9">
             <div class="form-panel">
                 <div class="form-title">
-                    <h4>处方</h4>
+                    <h4>字典信息</h4>
                 </div>
-                <div class="blank-text">
-                    <span>请先添加一种疾病类型。</span>
+                <div>
+                    <div id="toolbar">
+                        <button id="addOrderDetailBtn" type="button" class="btn btn-info" data-toggle="modal"
+                                data-target="#dictionaryModal" data-whatever="create">添加
+                        </button>
+                    </div>
+                    <input type="hidden" name="menuId">
+                    <table id="dictionaryTable"></table>
                 </div>
-                <form class="form-horizontal" id="prescribeForm" style="display: none">
-                    <input type="hidden" name="id">
-                    <input type="hidden" name="disease.id">
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">主治病症</label>
-                        <div class="col-sm-10">
-                            <p class="form-control-static">email@example.com</p>
-                            <!--<input type="text" name="disease.name" class="form-control" style="border: none" readonly="readonly">-->
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">处方名称</label>
-                        <div class="col-sm-9">
-                            <input type="text" name="name" placeholder="请输入名称" maxlength="20" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">处方简称</label>
-                        <div class="col-sm-9">
-                            <!--<input type="text" name="abbreviation" lay-verify="required" placeholder="请输入简称" maxlength="20" class="layui-input">-->
-                            <select class="form-control" name="abbreviation">
-                                <option value=""></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">处方类型</label>
-                        <div class="col-sm-9">
-                            <label class="radio-inline">
-                                <input type="radio" name="type" value="0" checked=""> 中药处方
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="type" value="1"> 针灸处方
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="type" value="2"> 中成药处方
-                            </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">处方方歌</label>
-                        <div class="col-sm-9">
-                            <textarea class="form-control" rows="4" name="doggerel" placeholder="请输入方歌"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">处方详情</label>
-                        <div class="col-sm-9">
-                            <input type="text" id="details" name="details" value="" maxlength="500">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-9">
-                            <button type="reset" class="btn btn-default">重置</button>
-                            <button type="button" class="btn btn-primary" id="save">保存</button>
-                            <button type="button" class="btn btn-primary" id="saveAndReset">保存并新建</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
 </div>
-<div class="modal fade" id="diseaseModal" tabindex="-1" role="dialog">
+<!--添加数据字典模态框-->
+<div class="modal fade" id="dictionaryModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">添加疾病类型</h4>
+                <h4 class="modal-title">添加数据字典</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal">
                     <input type="hidden" name="id" value="">
+                    <input type="hidden" name="type" value="">
                     <input type="hidden" name="pId" value="">
+                    <input type="hidden" name="menuId" value="">
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">所属类别</label>
+                        <label class="col-sm-2 control-label">名称</label>
                         <div class="col-sm-10">
-                            <p class="form-control-static">email@example.com</p>
-                            <!--<input type="text" class="form-control" name="name" maxlength="50" placeholder="名称">-->
+                            <input type="text" class="form-control" name="name" maxlength="50" placeholder="名称">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">疾病名称</label>
+                        <label class="col-sm-2 control-label">编码</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="name" maxlength="50" placeholder="名称">
+                            <input type="text" class="form-control" name="code" maxlength="50" placeholder="编码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">顺序号</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" name="orderNo" placeholder="顺序号">
                         </div>
                     </div>
                 </form>
@@ -159,7 +114,7 @@
 </div>
 <script src="static/zTree_v3/js/jquery.ztree.all.js"></script>
 <script src="static/zTree_v3/js/jquery.ztree.exhide.js"></script>
-<!--<script src="static/zTree_v3/js/fuzzysearch.js"></script>-->
+<script src="static/zTree_v3/js/fuzzysearch.js"></script>
 <!--<script src="static/jquery-ui/jquery-ui.js"></script>-->
 <!--<script src="static/tag-it/js/tag-it.js" charset="utf-8"></script>-->
 <!--<script src="static/js/common/pinying.js"></script>-->
