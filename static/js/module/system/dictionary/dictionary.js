@@ -1,123 +1,295 @@
 /*数据字典*/
 //@ sourceURL=dictionary.js
 $(function () {
-    // 加载菜单
-    $.getJSON('static/data/menu.json', loadMenuTree);
+    // 查询并加载菜单 tree
+    $.getJSON('static/data/dictionary.json', loadTree);
 
-    // 查询并加载数据字典 tree
-    // $.getJSON('static/data/dictionary.json', loadTree);
     // 模态框隐藏时重置表单
-    $('#dictionaryModal').on('hidden.bs.modal', function (e) {
+    $('#dictionaryModal').on('hide.bs.modal', function (e) {
         $("#dictionaryModal input").val('');
+        $("#dictionaryModal p").html('');
+        $('#dictionaryModal form').data('bootstrapValidator').resetForm(true);// 清空校验
     });
-    // 模态框 保存 按钮绑定点击事件
-    $('#saveBtn').on('click', saveBtnClick);
 
+    $('#saveBtn').on('click', saveDictionaryBtnClick);// 保存字典类型
+    // $('#saveAndCreatBtn').on('click', saveDictionaryBtnClick);// 保存字典类型
+    $('#addDictionaryItemBtn').on('click', addDictionaryItem);// 添加字典项
+    // 处方 保存按钮监听事件
+    // $('#save').on('click', savePrescribe);
+    // $('#saveAndReset').on('click', saveAndResetPrescribe);
 
+    // 表格拖拽
+    $('#dictionaryItem').bootstrapTable({
+        onReorderRowsDrag: function (table, row) {
+            // 拖拽钱触发
+            var dragbeforeidx = $(row).attr("data-index");// 取索引号
+        },
+        // 拖拽完成后的这条数据，
+        onReorderRowsDrop: function (table, row) {
+            var draglateridx = $(row).attr("data-index");// 取索引号
+        },
+        // 当拖拽结束后，整个表格的数据
+        onReorderRow: function (newData) {
+            //这里的newData是整个表格数据，数组形式
+            console.log(newData); // 调试用代码
+            /*$.post("",
+                {jsondata: JSON.stringify(newData)},//将整张表数据Post，当然，先序列化成Json
+                function (data) {
+                    if (data == "success") {
+                        $table.bootstrapTable('refresh');
+                    }
+                }
+            );*/
+        }
+    });
+
+    // ztree 参数设置
     var setting = {
+        view: {
+            addHoverDom: addHoverDom,
+            removeHoverDom: removeHoverDom,
+            showLine: false,
+            selectedMulti: false
+        },
+        edit: {
+            enable: true,
+            showRemoveBtn: showRemoveBtn,
+            showRenameBtn: showRenameBtn,
+            removeTitle: BTN.delete,
+            renameTitle: BTN.edit
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
         callback: {
-            onClick: onClick
+            onClick: onClick,
+            beforeEditName: beforeEditName,
+            beforeRemove: beforeRemove
         }
     };
 
     /**
-     * 加载左侧的菜单树
-     * @param menu
+     * 加载数据字典类型
+     * @param zNodes
      */
-    function loadMenuTree(menu) {
-        var zNodes = !!menu ? menu : [];
-        zNodes.unshift({"id": 100, "name": "公共字典项", "children": []});
-        console.log(zNodes);
-        var menuTree = $.fn.zTree.init($("#menuTree"), setting, zNodes);
-        menuTree.expandAll(true);
-        // 搜索框内容改变监听事件
-        fuzzySearch('menuTree', '.tree-panel .search-input', null, true); //初始化模糊搜索方法
-        menuTree.selectNode(menuTree.getNodes()[0]);
-        menuTree.setting.callback.onClick(null, menuTree.setting.treeId, menuTree.getNodes()[0]);
+    function loadTree(zNodes) {
+        if (zNodes.length > 0) {
+            for (var i = 0; i < zNodes.length; i++) {
+                zNodes[i].isParent = zNodes[i].type == 1;
+            }
+            var dictionaryTree = $.fn.zTree.init($("#dictionaryTree"), setting, zNodes);
+            dictionaryTree.expandAll(true);
+            // 搜索框内容改变监听事件
+            fuzzySearch('dictionaryTree', '.tree-panel .search-input', null, true); //初始化模糊搜索方法
+            selectFirstNode();
+        } else {
+            // 没有数据时显示提示信息并因此表单
+            $('#dictionaryTree').hide();
+            $('#dictionaryForm').hide();
+            $('.blank-text').show();
+        }
     }
 
     /**
-     * 菜单树节点的点击事件
-     * @param event 标准的 js event 对象
-     * @param treeId 对应 zTree 的 treeId
-     * @param treeNode 被点击的节点 JSON 数据对象
+     * 显示添加按钮
+     * @param treeId
+     * @param treeNode
      */
-    function onClick(event, treeId, treeNode) {
-        if (!treeId) treeId = 'menuTree';
-        var menuId = '';
-        if (!!treeNode) {
-            menuId = treeNode.id;
-        } else {
-            var treeObj = $.fn.zTree.getZTreeObj(treeId);
-            if (!!treeObj.getSelectedNodes) {
-                menuId = treeObj.getSelectedNodes()[0].id;
+    function addHoverDom(treeId, treeNode) {
+        var sObj = $("#" + treeNode.tId + "_span");
+        if (treeNode.type == 1 && $("#addBtn_" + treeNode.tId).length <= 0) {
+            var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                + "' title='添加字典类型' onfocus='this.blur();'></span>";
+            sObj.after(addStr);
+            var btn = $("#addBtn_" + treeNode.tId);
+            if (btn) {
+                btn.bind("click", treeNode, addDictionary);
             }
         }
-        if (!!menuId) {
-            $('.form-panel input[name="menuId"]').val(menuId);
-            // 根据菜单ID，查询该菜单下的所有字典数据
-            try {
-                $.getJSON('', {"menuId": menuId}, function (data, textStatus, jqXHR) {
-                    $('#dictionaryTable').bootstrapTable('load', data);
-                })
-            } catch (e) {
-                layer.alert('字典获取失败！', {title: '错误', icon: 2});
+    };
+
+    /**
+     * 移除添加按钮
+     * @param treeId
+     * @param treeNode
+     */
+    function removeHoverDom(treeId, treeNode) {
+        $("#addBtn_" + treeNode.tId).unbind().remove();
+    };
+
+    /**
+     * 是否显示编辑按钮
+     *      当前节点是字典类型  显示编辑按钮
+     *      当前节点是菜单，不显示编辑按钮
+     * @param treeId
+     * @param treeNode
+     * @returns {boolean}
+     */
+    function showRenameBtn(treeId, treeNode) {
+        return treeNode.type == 2;
+    }
+
+    /**
+     * 是否显示删除按钮
+     *      当前节点是字典类型  显示删除按钮
+     *      当前节点是菜单，不显示删除按钮
+     * @param treeId
+     * @param treeNode
+     * @returns {boolean}
+     */
+    function showRemoveBtn(treeId, treeNode) {
+        return treeNode.type == 2;
+    }
+
+    /**
+     * 选中第一个节点
+     */
+    function selectFirstNode() {
+        var treeObj = $.fn.zTree.getZTreeObj('dictionaryTree');
+        if (treeObj != null) {
+            var nodes = treeObj.getNodes();
+            if (nodes != null && nodes.length > 0) {
+                treeObj.selectNode(nodes[0]);
+                treeObj.setting.callback.onClick(null, treeObj.setting.treeId, nodes[0]);
             }
         }
     }
 
-    // 初始化列表
-    $('#dictionaryTable').bootstrapTable({
-        striped: true,// 隔行变色
-        toolbar: '#toolbar',
-        columns: [
-            {
-                field: 'name',
-                title: '名称'
-            },
-            {
-                field: 'code',
-                title: '编号'
-            },
-            {
-                field: 'id',
-                title: '操作',
-                events: 'operateEvents',
-                formatter: 'operateFormatter'
-            }
-        ],
-        // bootstrap-table-tree-column.js 插件配置
-        // treeShowField: 'name',
-        // parentIdField: 'pid'
-        // bootstrap-table-tree-column.js 插件配置
+    /**
+     * 点击添加图标触发
+     */
+    function addDictionary(event) {
+        if (!event) return;
+        var treeNode = event.data;
+        if (treeNode) {
+            $("#dictionaryModal input[name='pId']").val(treeNode.id);// 设置pId
+            $("#dictionaryModal input[name='type']").val(2);// 设置type
+            $(".form-horizontal p").html(getAncestorNodes(treeNode,"",1));// 设置 所属菜单（模块）
+        }
+        $('#dictionaryModal').find('.modal-title').text('添加字典类型');
+        $('#dictionaryModal').modal({backdrop: 'static'});
+    }
 
-        treeShowField: 'name',
-        parentIdField: 'pid',
-        onLoadSuccess: function (data) {
-            console.log('load');
-            // jquery.treegrid.js
-            $table.treegrid({
-                // initialState: 'collapsed',
-                treeColumn: 1,
-                // expanderExpandedClass: 'glyphicon glyphicon-minus',
-                // expanderCollapsedClass: 'glyphicon glyphicon-plus',
-                onChange: function () {
-                    $table.bootstrapTable('resetWidth');
+    /**
+     * ztree 获取祖先节点
+     * @param node 当前选中的节点
+     * @param connector 连接符
+     * @param flag 0 不包括自己 1 包括自己
+     * @returns {*}
+     */
+    function getAncestorNodes(node, connector, flag) {
+        if (node == null) return null;
+        if (!connector) {
+            connector = '->';
+        }
+        var newNode = node;
+        var str = '';
+        if (flag == 1) {
+            str = connector + newNode.name;
+        }
+        while (newNode.getParentNode() != null) {
+            var parentNode = newNode.getParentNode();
+            str = connector + parentNode.name + str;
+            newNode = parentNode;
+        }
+        return str.substr(2);
+    }
+
+    /**
+     * 单击树节点触发
+     *      单击的节点是菜单节点，则右侧提示“请选择一个字典类型”
+     *      单击的节点是字典类型节点，则右侧显示该字典类型下的所有字典项
+     * @param event
+     * @param treeId
+     * @param treeNode
+     */
+    function onClick(event, treeId, treeNode) {
+        if (!!treeNode) {
+            if (treeNode.type == 1) { //  菜单节点
+                $('.form-panel .dictionary-info').hide();
+                $('.form-panel .blank-text').show();
+            } else if (treeNode.type == 2) { //  字典类型节点
+                $('.form-panel .blank-text').hide();
+                $('.form-panel .dictionary-info').show();
+                $('.form-panel .dictionary-info input[name="id"]').val(treeNode.id);
+                $('.form-panel .dictionary-info p[name="name"]').html(treeNode.name);
+                $('.form-panel .dictionary-info p[name="code"]').html(treeNode.code);
+                $('#dictionaryItem').bootstrapTable();// 渲染bootstrap表格
+                try {
+                    var key = treeNode.id;
+                    $.getJSON('static/data/dictionaryItem.json', {pId: key}, function (data) {
+                        $('#dictionaryItem').bootstrapTable('load', data);// 表格
+                    });
+                } catch (e) {
+                    layer.alert('字典项获取失败，请联系系统管理员！', {title: '错误', icon: 2});
                 }
+            }
+        }
+    }
+
+    /**
+     * 点击编辑图标触发
+     */
+    function beforeEditName(treeId, treeNode) {
+        if (treeNode != null) {
+            $('#dictionaryModal').find("input[name='id']").val(treeNode.id);
+            $('#dictionaryModal').find("input[name='pId']").val(treeNode.pId);
+            $('#dictionaryModal').find("input[name='name']").val(treeNode.name);
+            $('#dictionaryModal').find("input[name='code']").val(treeNode.code);
+            $('.form-horizontal p').html(getAncestorNodes(treeNode), "", 0);
+            $('#dictionaryModal').find('.modal-title').text('修改字典类型');
+            $('#dictionaryModal').modal({backdrop: 'static'});
+        }
+        return false;
+    }
+
+    /**
+     * 点击删除图标触发
+     */
+    function beforeRemove(treeId, treeNode) {
+        if (treeNode) {
+            var msg = MSG.delete_confirm + '名为' + treeNode.name + '的数据字典类型吗?';
+            var url = '';
+            layer.confirm(msg, {icon: 3, title: BTN.delete}, function (index) {
+                // 后台删除
+                $.ajax({
+                    url: url + treeNode.id,
+                    type: 'DELETE',
+                    success: function (data, textStatus, jqXHR) {
+                        if (data) {
+                            layer.msg(MSG.delete_success, {offset: 'rb', time: 2000});
+                            // ztree删除节点
+                            var treeobj = $.fn.zTree.getZTreeObj(treeId);
+                            treeobj.removeNode(treeNode, false);// 不触发回调方法
+                        } else {
+                            layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
+                    }
+                });
+                layer.close(index);
             });
         }
-        // bootstrap-table-treetreegrid.js 插件配置
-    });
-
+        return false;
+    }
 
     /**
      * 模态框 保存 按钮点击事件
      */
-    function saveBtnClick() {
+    function saveDictionaryBtnClick() {
         $('#dictionaryModal form').bootstrapValidator('validate');// 触发校验
         var flag = $('#dictionaryModal form').data('bootstrapValidator').isValid();// 获取校验结果
         if (flag) {
-            saveDictionary($('#dictionaryModal form').serialize());
+            var type = $("#dictionaryModal input[name='type']").val();
+            if (type == 2) {// 保存字典
+                saveDictionary($('#dictionaryModal form').serialize());
+            } else if (type == 3) {// 保存字典项
+                saveDictionaryItem($('#dictionaryModal form').serialize());
+            }
         }
     }
 
@@ -141,121 +313,39 @@ $(function () {
             code: {
                 validators: {
                     notEmpty: {
-                        message: '值不能为空！'
+                        message: '编码不能为空！'
                     }
                 }
             }
         }
     });
 
-
     /**
-     * 加载数据字典
-     * @param zNodes
-     */
-    function loadTree(zNodes) {
-        if (zNodes.length > 0) {
-            $.each(zNodes, function (i, node) {
-                if (node.pId != null) {
-                    node.showName = node.name + "【" + node.code + "】";
-                    if (node.type == 0) {
-                        node.isParent = true;
-                    }
-                } else {
-                    node.showName = node.name;
-                    node.isParent = true;
-                }
-            });
-            var dictionaryTree = $.fn.zTree.init($("#dictionaryTree"), setting, zNodes);
-            dictionaryTree.expandAll(true);
-            // 搜索框内容改变监听事件
-            fuzzySearch('dictionaryTree', '#searchInput', null, true); //初始化模糊搜索方法
-            dictionaryTree.selectNode(dictionaryTree.getNodes()[0])
-        }
-    }
-
-    /**
-     * 显示添加按钮
-     * @param treeId
-     * @param treeNode
-     */
-    function addHoverDom(treeId, treeNode) {
-        var sObj = $("#" + treeNode.tId + "_span");
-        if (treeNode.editNameFlag || $("#addBtn_" + treeNode.tId).length > 0) return;
-        var addStr = "<span class='button add' id='addBtn_" + treeNode.tId
-            + "' title='添加' onfocus='this.blur();'></span>";
-        sObj.after(addStr);
-        var btn = $("#addBtn_" + treeNode.tId);
-        if (btn) {
-            btn.bind("click", treeNode, add);
-        }
-    };
-
-    /**
-     * 移除添加按钮
-     * @param treeId
-     * @param treeNode
-     */
-    function removeHoverDom(treeId, treeNode) {
-        $("#addBtn_" + treeNode.tId).unbind().remove();
-    };
-
-    /**
-     * 点击添加图标触发
-     */
-    function add(event) {
-        if (!event) return;
-        var treeNode = event.data;
-        if (treeNode) {
-            var parentNode = treeNode.getParentNode();
-            if (parentNode) {
-                $("#dictionaryModal input[name='pId']").val(parentNode.pId);// 设置pId
-            } else {
-                $("#dictionaryModal input[name='pId']").val(0);// 设置pId
-            }
-            $("#dictionaryModal input[name='type']").val(treeNode.level);// 设置节点类型
-        }
-        $('#dictionaryModal').modal({backdrop: 'static'});
-    }
-
-    /**
-     * 点击编辑图标触发
-     */
-    function beforeEditName(treeId, treeNode) {
-        if (treeNode) {// 给表单赋值
-            $("#dictionaryModal input[name='id']").val(treeNode.id);
-            $("#dictionaryModal input[name='pId']").val(treeNode.getParentNode().id);
-            $("#dictionaryModal input[name='name']").val(treeNode.name);
-            $("#dictionaryModal input[name='code']").val(treeNode.code);
-        }
-        $('#dictionaryModal').modal({backdrop: 'static'});
-        return false;
-    }
-
-    /**
-     * 数据字典保存
+     * 字典类型保存
      * @param data
      */
-    function saveDictionary(data) {
-        $.post('', data, function (resultData, textStatus, jqXHR) {
+    function saveDictionary(dictionaryData) {
+        $.post('/save', data, function (resultData, textStatus, jqXHR) {
             if (resultData) {
                 layer.msg(MSG.save_success, {offset: 'rb', time: 2000});
-                // 数据设置
-                resultData.showName = resultData.name + "【" + resultData.code + "】";
-                if (resultData.type == 0) {
-                    resultData.isParent = true;
-                }
-                var treeobj = $.fn.zTree.getZTreeObj('dictionaryTree');// 获取ztree
-                var oldNode = treeobj.getNodeByParam('id', resultData.id, null);// 根据id查询是否存在该节点
-                if (oldNode == null) {// 新增 不存在
-                    var parentNode = treeobj.getNodeByParam('id', resultData.pId, null);
-                    var newNodes = treeobj.addNodes(parentNode, resultData);
-                    treeobj.selectNode(newNodes[0]);
-                } else {// 修改 存在
-                    oldNode.name = resultData.name;
-                    oldNode.code = resultData.code;
-                    oldNode.showName = resultData.showName;
-                    treeobj.updateNode(oldNode);
+                // 增加节点并选中
+                var treeobj = $.fn.zTree.getZTreeObj('dictionaryTree');
+                if (treeobj != null) {
+                    var oldNode = treeobj.getNodeByParam('id', resultData.id, null);
+                    if (oldNode == null) {// 新增
+                        var newNodes = [];
+                        var parentNode = treeobj.getNodeByParam('id', resultData.pId, null);
+                        newNodes = treeobj.addNodes(parentNode, resultData);
+                        treeobj.selectNode(newNodes[0]);
+                        treeobj.setting.callback.onClick(null, treeobj.setting.treeId, newNodes[0]);
+                    } else {// 修改
+                        oldNode.name = resultData.name;
+                        oldNode.code = resultData.code;
+                        treeobj.updateNode(oldNode);
+                        treeobj.setting.callback.onClick(null, treeobj.setting.treeId, oldNode);
+                    }
+                } else {
+                    $.getJSON('static/data/dictionary.json', loadTree);
                 }
             } else {
                 layer.msg(MSG.save_fail, {offset: 'rb', time: 2000});
@@ -264,39 +354,91 @@ $(function () {
     }
 
     /**
-     * 点击删除图标触发
+     * 添加字典项
      */
-    function beforeRemove(treeId, treeNode) {
-        if (treeNode) {
-            if (treeNode.children) {// 有子节点
-                layer.msg('请先删除子节点！', {time: 2000});
-            } else {
-                var msg = MSG.delete_confirm + ' ' + treeNode.name + ' 吗?';
-                var url = '';
-                layer.confirm(msg, {icon: 3, title: BTN.delete}, function (index) {
-                    // 后台删除
-                    $.ajax({
-                        url: url + treeNode.id,
-                        type: 'DELETE',
-                        success: function (data, textStatus, jqXHR) {
-                            if (data) {
-                                layer.msg(MSG.delete_success, {offset: 'rb', time: 2000});
-                                // ztree删除节点
-                                var treeobj = $.fn.zTree.getZTreeObj(treeId);
-                                treeobj.removeNode(treeNode, false);// 不触发回调方法
-                            } else {
-                                layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
-                            }
-                        },
-                        error: function (XMLHttpRequest, textStatus, errorThrown) {
-                            layer.msg(MSG.delete_fail, {offset: 'rb', time: 2000});
-                        }
-                    });
-                    layer.close(index);
-                });
+    function addDictionaryItem() {
+        var pId = $('.form-panel .dictionary-info input[name="id"]').val();
+        if (!pId) {
+            layer.alert('请先选中一个字典类型！', {title: '错误', icon: 2});
+            return false;
+        }
+        $("#dictionaryModal input[name='pId']").val(pId);// 设置pId
+        $("#dictionaryModal input[name='type']").val(3);// 设置pId
+        var treeobj = $.fn.zTree.getZTreeObj('dictionaryTree');
+        if (treeobj != null) {
+            var dictionary = treeobj.getNodeByParam("id",pId,null);
+            if (dictionary != null) {
+                $(".form-horizontal p").html(getAncestorNodes(dictionary,"",1));// 设置 所属菜单（模块）
+                $('#dictionaryModal').find('.modal-title').text('添加字典项');
+                $('#dictionaryModal').modal({backdrop: 'static'});
             }
         }
-        return false;
+    }
+
+    /**
+     * 保存字典项
+     * @param data 待保存的数据
+     * @param flag 1 ：只保存；2 ：保存后新建
+     */
+    function saveDictionaryItem(data, flag) {
+        try {
+            $.post('/save', data, function (data, textStatus, jqXHR) {
+                if (data) {
+                    // 1.提示保存成功
+                    layer.msg(MSG.save_success, {offset: 'rb', time: 2000});
+                    // 2.刷新列表
+                    $.getJSON('static/data/dictionaryItem.json', {pId: data.type}, function (searchData) {
+                        $('#dictionaryItem').bootstrapTable('load', searchData);// 表格
+                    });
+                    $('#dictionaryModal').modal('hide');
+                    /*if (flag == 1) {
+                        // 3.关闭模态框
+                        $('#dictionaryModal').modal('hide');
+                    } else if (flag == 2) {
+                        // 重置模态框
+                        $("#dictionaryModal input[name='id']").val('');
+                        $("#dictionaryModal input[name='name']").val('');
+                        $("#dictionaryModal input[name='code']").val('');
+                    }*/
+                } else {
+                    layer.msg(MSG.save_fail, {offset: 'rb', time: 2000});
+                }
+            });
+        } catch (e) {
+            layer.alert('保存失败，请联系系统管理员！', {title: '错误', icon: 2});
+        }
     }
 });
 
+
+/**
+ * 表格操作列
+ * @param value
+ * @param row
+ * @param index
+ * @returns {string}
+ *  data-toggle="modal" data-value="' + value + '" data-target="#orderDetailModal" data-whatever="update"
+ */
+function operateFormatter(value, row, index) {
+    return [
+        '<a class="update" href="javascript:void(0);" title="修改">',
+        '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>',
+        '</a>  ',
+        '<a class="remove" href="javascript:void(0);" title="删除">',
+        '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>',
+        '</a>'
+    ].join('');
+}
+
+/**
+ * 表格操作列按钮点击事件
+ */
+window.operateEvents = {
+    'click .update': function (e, value, row, index) {
+        // editOrderDetail(value);
+        // alert('You click like action, row: ' + JSON.stringify(value));
+    },
+    'click .remove': function (e, value, row, index) {
+        // delOrderDetail(e,value,row,index);
+    }
+};

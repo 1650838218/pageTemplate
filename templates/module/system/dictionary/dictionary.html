@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>数据字典</title>
     <link rel="stylesheet" href="static/zTree_v3/css/bootstrapStyle/bootstrapStyle.css">
+    <link rel="stylesheet" href="static/bootstrap-table/extensions/reorder-rows/bootstrap-table-reorder-rows.css">
     <!--<link rel="stylesheet" href="static/tag-it/css/jquery.tagit.css">-->
     <!--<link rel="stylesheet" href="static/tag-it/css/tagit.ui-zendesk.css">-->
     <style type="text/css">
@@ -27,7 +28,7 @@
             display: none;
         }
         .form-panel {
-            padding: 0 20px;
+            padding: 0 20px 20px 20px;
         }
         .form-panel .form-title {
             padding: 13px 48px 13px 0;
@@ -36,7 +37,8 @@
             border-bottom: 1px solid #eee;
         }
         .form-horizontal {
-            padding: 15px 0;
+            padding: 15px 0 0 0;
+            margin-bottom: -10px;
         }
         button {
             margin: 0px 5px;
@@ -49,7 +51,10 @@
         <div class="col-md-3">
             <div class="tree-panel">
                 <input type="text" class="form-control search-input" placeholder="搜索">
-                <ul id="menuTree" class="ztree"></ul>
+                <ul id="dictionaryTree" class="ztree"></ul>
+                <div class="blank-text">
+                    <span>暂无数据字典。</span>
+                </div>
             </div>
         </div>
 
@@ -58,56 +63,79 @@
                 <div class="form-title">
                     <h4>字典信息</h4>
                 </div>
-                <div>
+                <div class="blank-text">
+                    <span>请选择一个字典类型。</span>
+                </div>
+                <div class="dictionary-info" style="display: none">
+                    <form class="form-horizontal" id="dictionaryForm">
+                        <input type="hidden" name="id" value="">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">字典类型名称：</label>
+                            <div class="col-sm-2" style="padding-left: 0px">
+                                <p name="name" class="form-control-static"></p>
+                            </div>
+                            <label class="col-sm-2 control-label">字典类型代码：</label>
+                            <div class="col-sm-2" style="padding-left: 0px">
+                                <p name="code" class="form-control-static"></p>
+                            </div>
+                        </div>
+                    </form>
                     <div id="toolbar">
-                        <button id="addOrderDetailBtn" type="button" class="btn btn-info" data-toggle="modal"
-                                data-target="#dictionaryModal" data-whatever="create">添加
+                        <button id="addDictionaryItemBtn" type="button" class="btn btn-info">添加字典项
                         </button>
                     </div>
-                    <input type="hidden" name="menuId">
-                    <table id="dictionaryTable"></table>
+                    <table id="dictionaryItem" data-toolbar="#toolbar" data-use-row-attr-func="true" data-reorderable-rows="true">
+                        <thead>
+                        <tr>
+                            <th data-field="name" data-align="center" data-width="40%">名称</th>
+                            <th data-field="code" data-align="center" data-width="40%">编码</th>
+                            <th data-field="id" data-align="center" data-width="" data-events="operateEvents"
+                                data-formatter="operateFormatter">操作
+                            </th>
+                        </tr>
+                        </thead>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!--添加数据字典模态框-->
 <div class="modal fade" id="dictionaryModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">添加数据字典</h4>
+                <h4 class="modal-title">添加字典类型</h4>
             </div>
             <div class="modal-body">
                 <form class="form-horizontal">
                     <input type="hidden" name="id" value="">
-                    <input type="hidden" name="type" value="">
                     <input type="hidden" name="pId" value="">
-                    <input type="hidden" name="menuId" value="">
+                    <input type="hidden" name="type" value="">
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">名称</label>
-                        <div class="col-sm-10">
+                        <label class="col-sm-3 control-label">所属菜单</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static">email@example.com</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">字典类型名称</label>
+                        <div class="col-sm-8">
                             <input type="text" class="form-control" name="name" maxlength="50" placeholder="名称">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">编码</label>
-                        <div class="col-sm-10">
+                        <label class="col-sm-3 control-label">字典类型编码</label>
+                        <div class="col-sm-8">
                             <input type="text" class="form-control" name="code" maxlength="50" placeholder="编码">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">顺序号</label>
-                        <div class="col-sm-10">
-                            <input type="number" class="form-control" name="orderNo" placeholder="顺序号">
                         </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
                 <button type="button" class="btn btn-primary" id="saveBtn">保存</button>
+                <!--<button type="button" class="btn btn-primary" id="saveAndCreatBtn">保存</button>-->
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
             </div>
         </div>
     </div>
@@ -115,6 +143,8 @@
 <script src="static/zTree_v3/js/jquery.ztree.all.js"></script>
 <script src="static/zTree_v3/js/jquery.ztree.exhide.js"></script>
 <script src="static/zTree_v3/js/fuzzysearch.js"></script>
+<script src="static/bootstrap-table/extensions/reorder-rows/jquery.tablednd.min.js"></script>
+<script src="static/bootstrap-table/extensions/reorder-rows/bootstrap-table-reorder-rows.js"></script>
 <!--<script src="static/jquery-ui/jquery-ui.js"></script>-->
 <!--<script src="static/tag-it/js/tag-it.js" charset="utf-8"></script>-->
 <!--<script src="static/js/common/pinying.js"></script>-->
